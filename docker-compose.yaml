@@ -1,0 +1,33 @@
+services:
+    app:
+        build: .
+        container_name: laravel          # Nombre del contenedor
+        tty: true                        # Asigna un terminal virtual al contenedor
+        volumes:
+            - ./home:/var/www/html       # Monta directorio local en /var/www/html
+        ports:
+            - "8000:8000"                # Acceso web a Laravel
+            - "5173:5173"                # Acceso a Vite (hot reload)
+        depends_on:
+            - db                         # Depende del servicio de base de datos
+
+    db:
+        image: mysql:8.0                 # MySQL o MariaDB
+        container_name: laravel_db       # Nombre del contenedor
+        environment:
+            MYSQL_ROOT_PASSWORD: root    # Contraseña usuario root
+            MYSQL_DATABASE: laravel      # Nombre de la base de datos
+            MYSQL_USER: dwes             # Nombre de usuario
+            MYSQL_PASSWORD: dwes         # Contraseña del usuario
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin     # Imagen PHPMyAdmin
+        container_name: laravel_pma      # Nombre del contenedor
+        environment:
+            PMA_HOST: db                 # Nombre del servicio host de base de datos
+            PMA_USER: root               # Usuario para login
+            PMA_PASSWORD: root           # Contraseña para login
+        ports:
+            - "8080:80"                  # Se accede a través del puerto 8080
+        depends_on:
+            - db                         # Depende del servicio db
