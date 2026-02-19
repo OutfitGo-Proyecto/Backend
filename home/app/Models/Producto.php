@@ -9,11 +9,31 @@ class Producto extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductoFactory> */
     use HasFactory;
-}
 
-public function tiendas()
-{
-    return $this->belongsToMany(Tienda::class, 'producto_tiendas')
-                ->withPivot('precio', 'url', 'en_stock')
-                ->withTimestamps();
+    public function marca()
+    {
+        return $this->belongsTo(Marca::class);
+    }
+
+    public function categoria()
+    {
+        return $this->belongsTo(Categoria::class);
+    }
+
+    public function tiendas()
+    {
+        return $this->belongsToMany(Tienda::class, 'producto_tiendas')
+                    ->withPivot('precio', 'url', 'en_stock')
+                    ->withTimestamps();
+    }
+
+    public function tallas()
+    {
+        return $this->belongsToMany(Talla::class, 'producto_talla');
+    }
+
+    public function colores()
+    {
+        return $this->belongsToMany(Color::class, 'producto_color');
+    }
 }

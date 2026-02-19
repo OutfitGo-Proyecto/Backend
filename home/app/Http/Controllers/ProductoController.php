@@ -8,47 +8,78 @@ use Illuminate\Http\Request;
 class ProductoController extends Controller
 {
     /**
-     * Muestra el catálogo completo o los resultados de búsqueda.
+     * Muestra el catálogo completo o los resultados de búsqueda con filtros.
      */
     public function index(Request $request)
     {
-        // 1. Iniciamos la consulta base
         $query = Producto::query();
 
-        // 2. Lógica del Buscador: Si el usuario escribió algo en la barra (?q=Nike)
+        // 1. Buscador Global
         if ($busqueda = $request->input('q')) {
-            $query->where('nombre', 'LIKE', "%{$busqueda}%")
+            $query->where(function ($q) use ($busqueda) {
+                $q->where('nombre', 'LIKE', "%{$busqueda}%")
                   ->orWhere('descripcion', 'LIKE', "%{$busqueda}%")
-                  // También buscamos por el nombre de la Marca relacionada
-                  ->orWhereHas('marca', function($q) use ($busqueda) {
-                      $q->where('nombre', 'LIKE', "%{$busqueda}%");
+                  ->orWhereHas('marca', function($qMarca) use ($busqueda) {
+                      $qMarca->where('nombre', 'LIKE', "%{$busqueda}%");
                   });
+            });
         }
 
-        // 3. Cargar relaciones (Eager Loading) para optimizar
-        // Traemos la 'marca' y las 'tiendas' para poder calcular el precio mínimo en la vista
-        $productos = $query->with(['marca', 'tiendas'])
-                           ->latest() // Los más nuevos primero
-                           ->paginate(12); // Paginación de 12 en 12
+        // 2. Filtros
+        if ($request->filled('marca_id')) {
+            $query->where('marca_id', $request->marca_id);
+        }
 
-        // 4. Retornamos la vista (que crearemos en el siguiente paso OUT-49)
-        return view('productos.index', compact('productos'));
+        if ($request->filled('categoria_id')) {
+            $query->where('categoria_id', $request->categoria_id);
+        }
+
+        // Filtro por Tallas (acepta múltiples separadas por coma: ?talla=S,M)
+        if ($request->filled('talla')) {
+            $tallas = explode(',', $request->talla);
+            $query->whereHas('tallas', function($q) use ($tallas) {
+                $q->whereIn('nombre', $tallas);
+            });
+        }
+
+        // Filtro por Colores (acepta múltiples: ?color=Rojo,Azul)
+        if ($request->filled('color')) {
+            $colores = explode(',', $request->color);
+            $query->whereHas('colores', function($q) use ($colores) {
+                $q->whereIn('nombre', $colores);
+            });
+        }
+
+        // Filtro por Rango de Precio (busca si ALGUNA tienda tiene el precio en rango)
+        if ($request->filled('precio_min')) {
+            $query->whereHas('tiendas', function($q) use ($request) {
+                $q->where('precio', '>=', $request->precio_min);
+            });
+        }
+
+        if ($request->filled('precio_max')) {
+            $query->whereHas('tiendas', function($q) use ($request) {
+                $q->where('precio', '<=', $request->precio_max);
+            });
+        }
+
+        // 3. Cargar relaciones y paginar
+        $productos = $query->with(['marca', 'tiendas', 'tallas', 'colores'])
+                           ->latest()
+                           ->paginate(12);
+
+        return response()->json($productos);
     }
 
     /**
-     * Muestra la ficha de un producto específico para comparar precios.
+     * Muestra la ficha de un producto específico.
      */
     public function show($slug)
     {
-        // 1. Buscar el producto por su SLUG (URL amigable)
         $producto = Producto::where('slug', $slug)
-            ->with(['marca', 'categoria', 'tiendas']) // Cargar todas las relaciones
-            ->firstOrFail(); // Si no existe, lanza error 404
+            ->with(['marca', 'categoria', 'tiendas', 'tallas', 'colores'])
+            ->firstOrFail();
 
-        // 2. Ordenar las tiendas por precio (de menor a mayor)
-        // Esto es clave para el comparador: queremos ver la oferta más barata primero.
-        $ofertas = $producto->tiendas->sortBy('pivot.precio');
-
-        return view('productos.show', compact('producto', 'ofertas'));
+        return response()->json($producto);
     }
 }

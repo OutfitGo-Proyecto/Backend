@@ -10,3 +10,7 @@ Route::get('/user', function (Request $request) {
 Route::get('/prueba', function () {
     return ['mensaje' => '¡Conexión exitosa con Laravel!'];
 });
+
+// Rutas Públicas de Productos
+Route::get('/productos', [App\Http\Controllers\ProductoController::class, 'index']);
+Route::get('/productos/{slug}', [App\Http\Controllers\ProductoController::class, 'show']);
