@@ -23,6 +23,7 @@ class Producto extends Model
     public function tiendas()
     {
         return $this->belongsToMany(Tienda::class, 'producto_tiendas')
+                    ->using(ProductoTienda::class)
                     ->withPivot('precio', 'url', 'en_stock')
                     ->withTimestamps();
     }

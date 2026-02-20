@@ -65,6 +65,8 @@ class DatabaseSeeder extends Seeder
             }
         });
 
+        $this->call([\Database\Seeders\SeederHistorialPrecio::class]);
+
         echo "✅ Base de datos poblada con éxito: 50 productos con múltiples precios.\n";
     }
 }
