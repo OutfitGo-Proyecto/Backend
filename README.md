@@ -1,6 +1,6 @@
 # Backend - OutfitGo
 
-Este repositorio contiene el backend de la aplicación de comercio electrónico **OutfitGo**, desarrollado con **Laravel 11** y **Docker**. Proporciona una API REST para gestionar productos, marcas, tiendas y filtros avanzados para el frontend en Angular.
+Este repositorio contiene el backend de la aplicación de comercio electrónico **OutfitGo**, desarrollado con **Laravel 11** y **Docker**. Proporciona una API REST para gestionar productos, marcas y filtros avanzados para el frontend en Angular.
 
 ## 🚀 Características
 
@@ -71,12 +71,11 @@ Obtiene la lista paginada de productos. Soporta los siguientes parámetros de co
             "id": 1,
             "nombre": "Zapatillas Runner",
             "slug": "zapatillas-runner",
+            "precio": 99.99,
+            "stock": 10,
             "marca": { "id": 2, "nombre": "Adidas" },
             "tallas": [ { "nombre": "42" }, { "nombre": "43" } ],
-            "colores": [ { "nombre": "Negro", "hex_code": "#000000" } ],
-            "tiendas": [
-                { "nombre": "Zalando", "pivot": { "precio": 99.99, "url": "..." } }
-            ]
+            "colores": [ { "nombre": "Negro", "hex_code": "#000000" } ]
         }
     ],
     "total": 50

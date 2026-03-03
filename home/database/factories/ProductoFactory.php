@@ -24,6 +24,8 @@ class ProductoFactory extends Factory
             'slug' => $this->faker->unique()->slug(),
             'descripcion' => $this->faker->paragraph(),
             'url_imagen_principal' => $this->faker->imageUrl(640, 480, 'fashion', true, 'Product'),
+            'precio' => $this->faker->randomFloat(2, 10, 200),
+            'stock' => $this->faker->numberBetween(0, 50),
             
             'marca_id' => Marca::factory(),
             'categoria_id' => Categoria::factory(),

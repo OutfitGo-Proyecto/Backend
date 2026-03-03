@@ -20,14 +20,6 @@ class Producto extends Model
         return $this->belongsTo(Categoria::class);
     }
 
-    public function tiendas()
-    {
-        return $this->belongsToMany(Tienda::class, 'producto_tiendas')
-                    ->using(ProductoTienda::class)
-                    ->withPivot('precio', 'url', 'en_stock')
-                    ->withTimestamps();
-    }
-
     public function tallas()
     {
         return $this->belongsToMany(Talla::class, 'producto_talla');

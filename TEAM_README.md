@@ -1,14 +1,14 @@
 # 🚀 OutfitGo - Proyecto de Desarrollo Web
 
-> **Comparador de Moda y Tienda Online Inteligente**
+> **Tienda Online Inteligente de Moda**
 
 Este documento describe la visión, arquitectura y estructura del equipo para el desarrollo de **OutfitGo**.
 
 ## 🎯 Objetivo del Proyecto
-Desarrollar una aplicación web moderna (SPA) que permita a los usuarios buscar, filtrar y comparar precios de ropa y accesorios de múltiples tiendas. El sistema centraliza ofertas para ofrecer siempre el mejor precio al consumidor final.
+Desarrollar una aplicación web moderna (SPA) que permita a los usuarios buscar, filtrar y comprar ropa y accesorios de ropa de nuestras marcas asociadas.
 
-*   **Propósito**: Facilitar la búsqueda de moda al mejor precio.
-*   **Innovación**: Comparador de precios en tiempo real por producto.
+*   **Propósito**: Facilitar la compra de moda en una única plataforma directa.
+*   **Foco**: Excelente experiencia de usuario, catálogo extenso y filtros avanzados.
 
 ## 🛠️ Stack Tecnológico (Arquitectura Headless)
 
@@ -31,7 +31,7 @@ Nuestro equipo se encarga de la lógica de negocio, gestión de datos y segurida
 
 **Responsabilidades Principales:**
 1.  **API RESTful**: Proveer endpoints JSON estructurados para el Frontend.
-2.  **Base de Datos**: Diseño del esquema Relacional (Productos, Variantes, Tiendas).
+2.  **Base de Datos**: Diseño del esquema Relacional (Productos, Variantes).
 3.  **Lógica de Filtrado**: Implementación de filtros avanzados (Talla, Color, Marca, Precio) utilizando relaciones Eloquent optimizadas.
 4.  **Calidad**: Mantenimiento de tests automatizados para asegurar la integridad del sistema.
 
@@ -49,7 +49,7 @@ Nuestro equipo se encarga de la lógica de negocio, gestión de datos y segurida
 *   [x] Diseño de Base de Datos (Migraciones).
 *   [x] Implementación de Filtros Avanzados (Controller).
 *   [ ] Autenticación de Usuarios (Sanctum/JWT).
-*   [ ] Integración de Crawler/Scraper de precios (Futuro).
+*   [ ] Integración de pasarelas de pago (Stripe/PayPal) (Futuro).
 
 ---
 *Documento generado para la coordinación del equipo de desarrollo OutfitGo.*

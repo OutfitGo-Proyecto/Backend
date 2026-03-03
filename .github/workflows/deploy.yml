@@ -1,0 +1,23 @@
+name: Deploy Backend to AWS EC2
+
+on:
+  push:
+    branches: [ "main" ] # Asegúrate de que tu rama principal se llame main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/ubuntu/backend
+            git pull origin main
+            docker-compose up -d --build

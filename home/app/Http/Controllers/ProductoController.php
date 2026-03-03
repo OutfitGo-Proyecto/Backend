@@ -50,21 +50,17 @@ class ProductoController extends Controller
             });
         }
 
-        // Filtro por Rango de Precio (busca si ALGUNA tienda tiene el precio en rango)
+        // Filtro por Rango de Precio
         if ($request->filled('precio_min')) {
-            $query->whereHas('tiendas', function($q) use ($request) {
-                $q->where('precio', '>=', $request->precio_min);
-            });
+            $query->where('precio', '>=', $request->precio_min);
         }
 
         if ($request->filled('precio_max')) {
-            $query->whereHas('tiendas', function($q) use ($request) {
-                $q->where('precio', '<=', $request->precio_max);
-            });
+            $query->where('precio', '<=', $request->precio_max);
         }
 
         // 3. Cargar relaciones y paginar
-        $productos = $query->with(['marca', 'tiendas', 'tallas', 'colores'])
+        $productos = $query->with(['marca', 'tallas', 'colores'])
                            ->latest()
                            ->paginate(12);
 
@@ -77,7 +73,7 @@ class ProductoController extends Controller
     public function show($slug)
     {
         $producto = Producto::where('slug', $slug)
-            ->with(['marca', 'categoria', 'tiendas', 'tallas', 'colores'])
+            ->with(['marca', 'categoria', 'tallas', 'colores'])
             ->firstOrFail();
 
         return response()->json($producto);

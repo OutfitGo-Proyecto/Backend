@@ -14,4 +14,3 @@ Route::get('/prueba', function () {
 // Rutas Públicas de Productos
 Route::get('/productos', [App\Http\Controllers\ProductoController::class, 'index']);
 Route::get('/productos/{slug}', [App\Http\Controllers\ProductoController::class, 'show']);
-Route::get('/productos/{id}/historial', [\App\Http\Controllers\Api\ControladorHistorialPrecio::class, 'index']);
