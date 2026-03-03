@@ -14,3 +14,7 @@ Route::get('/prueba', function () {
 // Rutas Públicas de Productos
 Route::get('/productos', [App\Http\Controllers\ProductoController::class, 'index']);
 Route::get('/productos/{slug}', [App\Http\Controllers\ProductoController::class, 'show']);
+
+Route::get('/test', function () {
+    return response()->json(['message' => '¡La API funciona!']);
+});
