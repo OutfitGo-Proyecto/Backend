@@ -1,13 +1,27 @@
-# Backend - OutfitGo
+# 🚀 E-Commerce Backend v2.0 | Core Engine
 
-Este repositorio contiene el backend de la aplicación de comercio electrónico **OutfitGo**, desarrollado con **Laravel 11** y **Docker**. Proporciona una API REST para gestionar productos, marcas y filtros avanzados para el frontend en Angular.
+![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white)
 
-## 🚀 Características
+Este proyecto ha evolucionado de un agregador de precios a un **sistema de E-commerce directo** altamente escalable, optimizado para una integración fluida con Angular y desplegado en la nube de AWS.
 
-*   **API RESTful**: Endpoints para consumo desde frontend.
-*   **Filtrado Avanzado**: Productos por Nombre, Marca, Categoría, Talla, Color y Precio.
-*   **Dockerizado**: Entorno de desarrollo completo con Docker Compose (Nginx/Apache, MySQL, PHPMyAdmin).
-*   **CI/CD**: Integración continua con GitHub Actions para ejecutar tests automáticamente.
+## 🛠️ Especificaciones Técnicas Actuales
+
+| Característica | Estado Actual |
+| :--- | :--- |
+| **Modelo de Negocio** | **E-Commerce Directo**. Productos con precio y stock propio. |
+| **Segmentación** | **Filtro por Público**: Adulto, Infantil, Unisex (vía Enum). |
+| **Calidad de Contenido** | **Descripciones Estrictas**: Longitud controlada entre 300 y 500 caracteres. |
+| **Optimización API** | **Eager Loading**: Carga eficiente de Categoría, Tallas y Colores en un solo request. |
+| **Infraestructura** | **Cloud Native**: Contenedores Docker en Amazon EC2 con CI/CD automatizado. |
+
+---
+
+## 🏗️ Arquitectura de Datos
+
+El sistema utiliza una estructura relacional optimizada para ropa y calzado, permitiendo una gestión precisa de variantes:
 
 ## 📋 Requisitos Previos
 
@@ -49,7 +63,12 @@ Este repositorio contiene el backend de la aplicación de comercio electrónico 
 
 La API principal para el catálogo se encuentra en `/api/productos`.
 
-### `GET /api/productos`
+### Endpoints Principales
+- `GET /api/productos`: Listado paginado (12 items) con carga de relaciones.
+- `GET /api/productos?publico=infantil`: Filtrado segmentado por audiencia.
+- `POST /api/productos`: Gestión de inventario (restringido).
+
+### Parámetros de Búsqueda para `GET /api/productos`
 Obtiene la lista paginada de productos. Soporta los siguientes parámetros de consulta (query params):
 
 | Parámetro | Descripción | Ejemplo |
@@ -61,6 +80,7 @@ Obtiene la lista paginada de productos. Soporta los siguientes parámetros de co
 | `color` | Filtrar por nombres de color (separados por coma). | `?color=Rojo,Azul` |
 | `precio_min` | Precio mínimo. | `?precio_min=50` |
 | `precio_max` | Precio máximo. | `?precio_max=150` |
+| `publico` | Filtrar por audiencia objetivo. | `?publico=infantil` |
 
 **Ejemplo de respuesta JSON:**
 ```json
@@ -99,3 +119,11 @@ docker exec laravel php artisan test
 *   `home/`: Código fuente de Laravel.
 *   `docker-compose.yaml`: Configuración de servicios Docker.
 *   `.github/workflows/`: Configuración de CI/CD.
+
+## 🚀 Despliegue y Mantenimiento
+
+### Actualización de Base de Datos
+Para resetear el entorno y poblarlo con datos de prueba coherentes (Seeders actualizados):
+```bash
+docker exec laravel php artisan migrate:fresh --seed
+```

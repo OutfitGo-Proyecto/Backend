@@ -29,4 +29,27 @@ class Producto extends Model
     {
         return $this->belongsToMany(Color::class, 'producto_color');
     }
+
+    public function scopeAdulto($query)
+    {
+        return $query->where('publico', 'adulto');
+    }
+
+    public function scopeInfantil($query)
+    {
+        return $query->where('publico', 'infantil');
+    }
+
+    public function scopeUnisex($query)
+    {
+        return $query->where('publico', 'unisex');
+    }
+
+    public function scopePublico($query, $tipo)
+    {
+        if (in_array($tipo, ['adulto', 'infantil', 'unisex'])) {
+            return $query->where('publico', $tipo);
+        }
+        return $query;
+    }
 }

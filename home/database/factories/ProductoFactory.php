@@ -22,7 +22,8 @@ class ProductoFactory extends Factory
         return [
             'nombre' => $this->faker->sentence(3), 
             'slug' => $this->faker->unique()->slug(),
-            'descripcion' => $this->faker->paragraph(),
+            'descripcion' => $this->faker->realTextBetween(300, 500),
+            'publico' => $this->faker->randomElement(['adulto', 'infantil', 'unisex']),
             'url_imagen_principal' => $this->faker->imageUrl(640, 480, 'fashion', true, 'Product'),
             'precio' => $this->faker->randomFloat(2, 10, 200),
             'stock' => $this->faker->numberBetween(0, 50),

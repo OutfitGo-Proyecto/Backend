@@ -26,6 +26,11 @@ class ProductoController extends Controller
         }
 
         // 2. Filtros
+        // Filtro por Público (adulto, infantil, unisex)
+        if ($request->filled('publico')) {
+            $query->publico($request->publico);
+        }
+
         if ($request->filled('marca_id')) {
             $query->where('marca_id', $request->marca_id);
         }
@@ -60,7 +65,7 @@ class ProductoController extends Controller
         }
 
         // 3. Cargar relaciones y paginar
-        $productos = $query->with(['marca', 'tallas', 'colores'])
+        $productos = $query->with(['marca', 'categoria', 'tallas', 'colores'])
                            ->latest()
                            ->paginate(12);
 

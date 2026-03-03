@@ -23,6 +23,7 @@ public function up(): void
         $table->string('nombre');
         $table->string('slug')->unique();
         $table->text('descripcion')->nullable();
+        $table->enum('publico', ['adulto', 'infantil', 'unisex'])->default('adulto');
         $table->string('url_imagen_principal')->nullable(); // main_image_url
         $table->decimal('precio', 10, 2);
         $table->integer('stock')->default(0);

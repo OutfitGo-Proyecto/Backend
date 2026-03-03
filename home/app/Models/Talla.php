@@ -9,6 +9,7 @@ class Talla extends Model
 {
     use HasFactory;
 
+    protected $table = 'tallas';
     protected $fillable = ['nombre'];
 
     public function productos()
