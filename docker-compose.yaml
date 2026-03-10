@@ -3,6 +3,7 @@ services:
         build: .
         container_name: laravel          # Nombre del contenedor
         tty: true                        # Asigna un terminal virtual al contenedor
+        restart: always                  # Hace que se encienda solo si el servidor se reinicia
         volumes:
             - ./home:/var/www/html       # Monta directorio local en /var/www/html
         ports:
@@ -14,6 +15,7 @@ services:
     db:
         image: mysql:8.0                 # MySQL o MariaDB
         container_name: laravel_db       # Nombre del contenedor
+        restart: always                  # Hace que se encienda solo si el servidor se reinicia
         environment:
             MYSQL_ROOT_PASSWORD: root    # Contraseña usuario root
             MYSQL_DATABASE: laravel      # Nombre de la base de datos
@@ -23,6 +25,7 @@ services:
     phpmyadmin:
         image: phpmyadmin/phpmyadmin     # Imagen PHPMyAdmin
         container_name: laravel_pma      # Nombre del contenedor
+        restart: always                  # Hace que se encienda solo si el servidor se reinicia
         environment:
             PMA_HOST: db                 # Nombre del servicio host de base de datos
             PMA_USER: root               # Usuario para login
