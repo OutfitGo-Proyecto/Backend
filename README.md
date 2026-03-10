@@ -61,28 +61,14 @@ El sistema utiliza una estructura relacional optimizada para ropa y calzado, per
 
 ## 📡 Documentación de la API
 
-La API principal para el catálogo se encuentra en `/api/productos`.
+La API se divide en zonas públicas para el catálogo y zonas privadas protegidas mediante Laravel Sanctum (Bearer Tokens).
 
-### Endpoints Principales
-- `GET /api/productos`: Listado paginado (12 items) con carga de relaciones.
-- `GET /api/productos?publico=infantil`: Filtrado segmentado por audiencia.
-- `POST /api/productos`: Gestión de inventario (restringido).
+### 📦 Catálogo de Productos (Público)
+- `GET /api/productos`: Listado paginado (12 items) con carga de relaciones (tallas, colores, marcas).
+- `GET /api/productos/{slug}`: Detalle completo de un producto específico.
+- `GET /api/productos?publico=infantil`: Filtrado avanzado y segmentado.
 
-### Parámetros de Búsqueda para `GET /api/productos`
-Obtiene la lista paginada de productos. Soporta los siguientes parámetros de consulta (query params):
-
-| Parámetro | Descripción | Ejemplo |
-| :--- | :--- | :--- |
-| `q` | Búsqueda por texto (nombre o descripción). | `?q=Nike` |
-| `marca_id` | ID de la marca. | `?marca_id=1` |
-| `categoria_id` | ID de la categoría. | `?categoria_id=5` |
-| `talla` | Filtrar por nombres de talla (separados por coma). | `?talla=M,L` |
-| `color` | Filtrar por nombres de color (separados por coma). | `?color=Rojo,Azul` |
-| `precio_min` | Precio mínimo. | `?precio_min=50` |
-| `precio_max` | Precio máximo. | `?precio_max=150` |
-| `publico` | Filtrar por audiencia objetivo. | `?publico=infantil` |
-
-**Ejemplo de respuesta JSON:**
+**Ejemplo de respuesta JSON (`GET /api/productos`):**
 ```json
 {
     "current_page": 1,
@@ -102,8 +88,99 @@ Obtiene la lista paginada de productos. Soporta los siguientes parámetros de co
 }
 ```
 
+### Parámetros de Búsqueda para `GET /api/productos`
+Soporta los siguientes parámetros de consulta (query params):
+
+| Parámetro | Descripción | Ejemplo |
+| :--- | :--- | :--- |
+| `q` | Búsqueda por texto (nombre o descripción). | `?q=Nike` |
+| `marca_id` | ID de la marca. | `?marca_id=1` |
+| `categoria_id` | ID de la categoría. | `?categoria_id=5` |
+| `talla` | Filtrar por nombres de talla (separados por coma). | `?talla=M,L` |
+| `color` | Filtrar por nombres de color (separados por coma). | `?color=Rojo,Azul` |
+| `precio_min` | Precio mínimo. | `?precio_min=50` |
+| `precio_max` | Precio máximo. | `?precio_max=150` |
+| `publico` | Filtrar por audiencia objetivo. | `?publico=infantil` |
+
 ### `GET /api/productos/{slug}`
-Obtiene el detalle de un producto específico por su URL amigable (slug).
+Obtiene el detalle completo de un producto específico por su URL amigable (slug).
+
+**Ejemplo de respuesta JSON (`GET /api/productos/{slug}`):**
+```json
+{
+    "id": 1,
+    "nombre": "Zapatillas Runner",
+    "slug": "zapatillas-runner",
+    "descripcion": "Zapatillas ideales para running.",
+    "precio": 99.99,
+    "stock": 10,
+    "marca": { "id": 2, "nombre": "Adidas" },
+    "categoria": { "id": 5, "nombre": "Calzado Deportivo" },
+    "tallas": [ { "id": 1, "nombre": "42" } ],
+    "colores": [ { "id": 1, "nombre": "Negro", "hex_code": "#000000" } ]
+}
+```
+
+### 🔑 Autenticación de Usuarios (Sanctum)
+- `POST /api/register`: Creado de cuenta nueva (requiere `name`, `email`, `password`).
+- `POST /api/login`: Inicio de sesión, retorna el token de acceso.
+- `POST /api/logout`: Cierre de sesión y revocación del token (Requiere Auth).
+- `GET /api/user`: Obtener los datos del usuario logueado (Requiere Auth).
+
+**Ejemplo de respuesta JSON (`POST /api/login`):**
+```json
+{
+    "user": {
+        "id": 1,
+        "name": "Juan Perez",
+        "email": "juan@example.com"
+    },
+    "token": "1|LaravelSanctumTokenExample..."
+}
+```
+
+### 🛒 Carrito de Compras (Requiere Auth)
+- `GET /api/cart`: Listar ítems actuales en el carrito del usuario.
+- `POST /api/cart`: Añadir un producto al carrito (requiere `producto_id`, `cantidad`, y opcionalmente `talla_id`, `color_id`).
+- `DELETE /api/cart/{id}`: Eliminar un ítem específico del carrito.
+
+**Ejemplo de respuesta JSON (`GET /api/cart`):**
+```json
+{
+    "data": [
+        {
+            "id": 1,
+            "producto": {
+                "id": 5,
+                "nombre": "Camiseta Básica",
+                "precio": 19.99
+            },
+            "cantidad": 2,
+            "talla": { "nombre": "M" },
+            "color": { "nombre": "Blanco" },
+            "subtotal": 39.98
+        }
+    ],
+    "total_cart": 39.98
+}
+```
+
+### 💳 Checkout y Pedidos (Requiere Auth)
+- `POST /api/checkout`: Procesar carrito actual generando un nuevo Pedido (`Order`), restando inventario y vaciando el carrito en el proceso.
+
+**Ejemplo de respuesta JSON (`POST /api/checkout`):**
+```json
+{
+    "message": "Pedido realizado con éxito",
+    "order": {
+        "id": 101,
+        "user_id": 1,
+        "total": 39.98,
+        "status": "pending",
+        "created_at": "2026-03-10T12:00:00.000000Z"
+    }
+}
+```
 
 ## ✅ Tests
 
