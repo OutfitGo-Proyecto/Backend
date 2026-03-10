@@ -20,9 +20,9 @@ jobs:
           script: |
             cd /home/ubuntu/backend
             git pull origin main
-            docker-compose up -d --build
 
             docker-compose down
-            
+
+            docker-compose up -d --build            
             sleep 10
             docker-compose exec -T app php artisan migrate --force
