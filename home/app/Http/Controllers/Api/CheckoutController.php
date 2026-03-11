@@ -23,18 +23,20 @@ class CheckoutController extends Controller
             return response()->json(['message' => 'El carrito está vacío.'], 400);
         }
 
+        $total = 0;
+        
+        // Verificar stock para todos los productos antes de procesar
+        foreach ($cartItems as $item) {
+            if ($item->producto->stock < $item->cantidad) {
+                return response()->json([
+                    'message' => "Stock insuficiente para el producto: {$item->producto->nombre}"
+                ], 422);
+            }
+            $total += $item->producto->precio * $item->cantidad;
+        }
+
         try {
             DB::beginTransaction();
-
-            $total = 0;
-            
-            // Verificar stock nuevamente para todos los productos antes de procesar
-            foreach ($cartItems as $item) {
-                if ($item->producto->stock < $item->cantidad) {
-                    throw new \Exception("Stock insuficiente para el producto: {$item->producto->nombre}");
-                }
-                $total += $item->producto->precio * $item->cantidad;
-            }
 
             // Crear la orden
             $order = Order::create([

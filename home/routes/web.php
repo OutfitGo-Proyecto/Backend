@@ -4,11 +4,6 @@ use App\Http\Controllers\ProductoController;
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-// Ruta para la página de inicio / catálogo / buscador
 Route::get('/', [ProductoController::class, 'index'])->name('home');
 
 // Ruta alternativa si quieres una url tipo /catalogo

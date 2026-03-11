@@ -7,14 +7,6 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\ProductoController;
 
-Route::get('/prueba', function () {
-    return response()->json(['mensaje' => '¡Conexión exitosa con Laravel!']);
-});
-
-Route::get('/test', function () {
-    return response()->json(['message' => '¡La API funciona!']);
-});
-
 // Rutas Públicas de Productos
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::get('/productos/{slug}', [ProductoController::class, 'show']);
