@@ -1,5 +1,5 @@
 # Usamos una imagen oficial de PHP. La versión 8.2 es ideal para Laravel 10/11.
-FROM php:8.2-cli
+FROM php:8.4-cli
 
 # Instalar dependencias del sistema necesarias
 # (git, zip para composer, librerías para imágenes y bases de datos)
