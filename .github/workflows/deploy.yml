@@ -33,11 +33,12 @@ jobs:
             # Espera de seguridad
             sleep 60
             
-            # Instalación de librerías
-            docker compose exec -T app composer install --no-dev --optimize-autoloader
+            # Instalación de librerías (Quitamos --no-dev para tener Faker y poder usar Seeders)
+            docker compose exec -T app composer install --optimize-autoloader
+
+            # Limpiar caché de configuración para que use el DB_HOST correcto
+            docker compose exec -T app php artisan config:clear
 
             # Engaño a Laravel para que no falle con SQLite y forzamos MySQL
             docker compose exec -T app touch database/database.sqlite
             docker compose exec -T app php artisan migrate:fresh --seed --force --database=mysql
-            # 6. Ahora que ya existe 'vendor', artisan ya no dará error
-            docker compose exec -T app php artisan migrate:fresh --seed --force
