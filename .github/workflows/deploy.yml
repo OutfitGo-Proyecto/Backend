@@ -22,8 +22,18 @@ jobs:
             cd /home/ubuntu/backend
             git pull origin main
 
-            docker compose down --remove-orphans
+            # 1. LIMPIEZA RADICAL (Borra imágenes y contenedores huérfanos para liberar GBs)
+            docker system prune -af
 
+            # 2. REINICIO TOTAL
+            docker compose down --remove-orphans
             docker compose up -d --build            
-            sleep 40
-            docker compose exec -T app php artisan migrate --seed --force
+            
+            # 3. ESPERA DE SEGURIDAD (60 segundos para que MySQL arranque bien)
+            sleep 60
+            
+            # 4. INSTALACIÓN DE LIBRERÍAS (Arregla el fallo del autoload.php)
+            docker compose exec -T app composer install
+
+            # 5. CARGA DE PRODUCTOS (Borra todo y mete tus Nike, Adidas, etc.)
+            docker compose exec -T app php artisan migrate:fresh --seed --force
