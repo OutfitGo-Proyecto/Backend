@@ -87,7 +87,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nombre' => 'Zapatillas Nike Air Force 1 Clásicas Blancas',
                 'descripcion' => 'Vive la leyenda con las icónicas zapatillas Nike Air Force 1. Un diseño clásico e impecable completamente en blanco que combina con absolutamente cualquier conjunto de ropa de tu armario. Están confeccionadas con cuero genuino de alta durabilidad, costuras cosidas meticulosamente y la emblemática amortiguación Nike Air oculta en la suela gruesa, garantizando una comodidad insuperable en cada uno de tus pasos diarios. Perfectas para un estilo casual, urbano y atemporal.',
-                'publico' => 'unisex',
+                'publico' => 'hombre',
                 'url_imagen_principal' => 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80',
                 'precio' => 119.99,
                 'stock' => 45,
@@ -99,7 +99,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nombre' => 'Sudadera con Capucha Adidas Originals Trefoil',
                 'descripcion' => 'Acurrúcate con estilo gracias a esta sudadera clásica de Adidas Originals. Destaca por exhibir el icónico y gigantesco logotipo del Trifolio (Trefoil) estampado en pleno pecho, convirtiéndose en el centro de todas las miradas. Fabricada con una rica mezcla de felpa y algodón de origen sostenible que acaricia la piel. Dispone de una práctica capucha ajustable con cordón grueso, además de un amplio bolsillo de canguro frontal para mantener las manos calientes en las frías mañanas de invierno urbano.',
-                'publico' => 'adulto',
+                'publico' => 'hombre',
                 'url_imagen_principal' => 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800&q=80',
                 'precio' => 64.95,
                 'stock' => 30,
@@ -111,7 +111,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nombre' => 'Pantalón Vaquero Levi\'s 501 Original Fit',
                 'descripcion' => 'La prenda que lo empezó absolutamente todo hace más de un siglo. Los genuinos e irremplazables vaqueros Levi\'s número 501 Original Fit representan el plano base a partir del cual todos los demás jeans han sido confeccionados en la historia moderna. Corte recto indiscutible en la cadera y el muslo, con la clásica y mundialmente conocida bragueta de botones remachados. Una tela denim de peso pesado, súper resistente que envejece con muchísima personalidad adaptándose a tu forma corporal única con el tiempo.',
-                'publico' => 'unisex',
+                'publico' => 'hombre',
                 'url_imagen_principal' => 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=800&q=80',
                 'precio' => 89.00,
                 'stock' => 80,
@@ -135,7 +135,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nombre' => 'Zapatillas de Running Puma Velocity Nitro 2',
                 'descripcion' => 'Experimenta la sensación real de flotar sobre el asfalto cuando sales a correr utilizando las zapatillas de alto rendimiento Puma Velocity Nitro 2. Este excepcional calzado deportivo neutro integra en toda la entresuela la innovadora espuma inyectada con gas nitrógeno patentada por la marca, garantizando de este modo un retorno de energía supremo, una amortiguación absurdamente suave y sobre todo una ligereza incomparable. El exterior de malla súper técnica envuelve cuidadosamente todo tu pie proporcionando increíble sujeción.',
-                'publico' => 'adulto',
+                'publico' => 'hombre',
                 'url_imagen_principal' => 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=800&q=80',
                 'precio' => 135.50,
                 'stock' => 25,
@@ -147,7 +147,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nombre' => 'Zapatillas Vans Old Skool Classic Skate',
                 'descripcion' => 'Liderando ininterrumpidamente el estilo callejero urbano y abrazando por completo la genuina cultura de los deportes extremos de California encontramos a las maravillosas zapatillas Vans Old Skool. Primer calzado legendario en lucir públicamente la inconfundible franja lateral ondulada Sidestripe de la compañía. Se han fabricado minuciosamente con fuertes empeines mezclando tela de lona súper duradera e inserciones protectoras frontales de gamuza auténtica. Suela inyectada de caucho puro con la textura patentada Waffle.',
-                'publico' => 'unisex',
+                'publico' => 'mujer',
                 'url_imagen_principal' => 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=800&q=80',
                 'precio' => 75.00,
                 'stock' => 50,
@@ -159,7 +159,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nombre' => 'Vestido Zara Mujer Textura Midi Fluido',
                 'descripcion' => 'Deslumbra elegantemente y acapara todas las atenciones apostando enormemente por este sofisticado y polivalente vestido de corte midi perteneciente al catálogo Zara Woman. Presenta una tela meticulosamente hilada que destaca sobre todo por un maravilloso tejido muy fluido y vaporoso con sutiles pero efectivas micro texturas. Dispone de un favorecedor escote central terminado delicadamente en forma de letra pico y delicados tirantes ultra finos que permiten lucir abiertamente los hombros durante largas cenas.',
-                'publico' => 'adulto',
+                'publico' => 'mujer',
                 'url_imagen_principal' => 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=800&q=80',
                 'precio' => 39.95,
                 'stock' => 40,
@@ -183,7 +183,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nombre' => 'Zapatillas Deportivas New Balance 574 Core',
                 'descripcion' => 'Abraza la silueta inconfundible, inigualable y probablemente la más importante creada jamás en toda la extensísima historia cronológica de zapatillas New Balance, hablamos nada menos que del magistral modelo 574 Core. Este zapato icónico de aspecto retro fusiona exitosamente de manera experta el confort con unas líneas francamente limpias y atractivas. Empeine transpirable cuidadosamente mezclado de gamuza real premium con ventilación técnica de malla. Entresuela dotada de soporte especial de espuma EVA encapsulada.',
-                'publico' => 'unisex',
+                'publico' => 'hombre',
                 'url_imagen_principal' => 'https://images.unsplash.com/photo-1539185441755-769473a23570?w=800&q=80',
                 'precio' => 95.00,
                 'stock' => 60,
@@ -195,7 +195,7 @@ class DatabaseSeeder extends Seeder
             [
                 'nombre' => 'Gorra Trucker Unisex Adidas Originals',
                 'descripcion' => 'Remata magistralmente tu conjunto de ropa de estilo puramente callejero y protege cómodamente frente al sol tus propios ojos introduciendo este espléndido accesorio. Es ni más ni menos que una sensacional gorra tipo trucker perteneciente íntegramente a Adidas Originals. Presenta majestuosamente un diseño superior en el que predomina un panel delantero muy robusto luciendo el característico e icónico logotipo sobredimensionado del trébol. Cuenta con toda la zona de la mitad posterior confeccionada en fina malla.',
-                'publico' => 'unisex',
+                'publico' => 'hombre',
                 'url_imagen_principal' => 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=800&q=80',
                 'precio' => 22.50,
                 'stock' => 150,
@@ -259,6 +259,7 @@ class DatabaseSeeder extends Seeder
                 'base' => $productosReales[8],
                 'nombre' => 'Zapatillas Deportivas New Balance 990',
                 'descripcion' => 'Asombra drásticamente al gigantesco mundo exterior presumiendo con soberbia de lucir libremente el estandarte que representa con abrumadora contundencia el linaje americano, esto es sin duda alguna calzar alegremente las New Balance modelo número 990 clásico indiscutible. Zapatillas míticas provistas orgullosamente de las líneas estéticas más atemporales disponibles hoy por hoy en el competitivo mercado actual del running. Destapan grandes y múltiples inserciones generosas compuestas con rica gamuza de cerdo.',
+                'publico' => 'mujer',
                 'colores' => [$colores['Azul Marino']->id, $colores['Beige']->id]
             ]
         ];
