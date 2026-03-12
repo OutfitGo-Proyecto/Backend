@@ -17,11 +17,16 @@ services:
         image: mysql:8.0                 # MySQL o MariaDB
         container_name: laravel_db       # Nombre del contenedor
         restart: always                  # Hace que se encienda solo si el servidor se reinicia
+        volumes:
+            - db_data:/var/lib/mysql     # Persistencia de datos
         environment:
             MYSQL_ROOT_PASSWORD: root    # Contraseña usuario root
             MYSQL_DATABASE: laravel      # Nombre de la base de datos
             MYSQL_USER: dwes             # Nombre de usuario
             MYSQL_PASSWORD: dwes         # Contraseña del usuario
+
+volumes:
+    db_data:                             # Definición del volumen
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin     # Imagen PHPMyAdmin
