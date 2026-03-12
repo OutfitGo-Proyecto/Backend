@@ -22,8 +22,22 @@ jobs:
             cd /home/ubuntu/backend
             git pull origin main
 
-            docker compose down --remove-orphans
+            # 1. Limpieza de disco agresiva
+            docker system prune -af
 
+            # 2. Borramos la carpeta vendor si existe (por si está corrupta)
+            # y borramos el archivo de bloqueo de docker para que empiece de cero
+            rm -rf vendor
+            
+            # 3. Reinicio total
+            docker compose down --remove-orphans
             docker compose up -d --build            
-            sleep 40
-            docker compose exec -T app php artisan migrate --seed --force
+            
+            # 4. Espera de seguridad para que el contenedor respire
+            sleep 60
+            
+            # 5. Forzamos la instalación de librerías DESDE FUERA (para que no falle artisan)
+            docker compose exec -T app composer install --no-dev --optimize-autoloader
+
+            # 6. Ahora que ya existe 'vendor', artisan ya no dará error
+            docker compose exec -T app php artisan migrate:fresh --seed --force
