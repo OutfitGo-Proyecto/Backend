@@ -15,6 +15,10 @@ class CheckoutController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'direccion_envio' => 'required|string',
+        ]);
+
         $user = $request->user();
         
         $cartItems = CartItem::with('producto')->where('user_id', $user->id)->get();
@@ -43,6 +47,7 @@ class CheckoutController extends Controller
                 'user_id' => $user->id,
                 'total' => $total,
                 'estado' => 'completado',
+                'direccion_envio' => $request->direccion_envio,
             ]);
 
             // Añadir items a la orden y restar stock

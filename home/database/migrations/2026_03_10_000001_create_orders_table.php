@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
@@ -13,12 +12,17 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->decimal('total', 10, 2);
             $table->string('estado')->default('completado'); // pendiente, completado, cancelado
+            $table->string('direccion_envio')->nullable()->after('estado');
             $table->timestamps();
+
         });
     }
 
     public function down(): void
     {
         Schema::dropIfExists('orders');
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn('direccion_envio');
+        });
     }
 };

@@ -15,6 +15,7 @@ class Order extends Model
         'user_id',
         'total',
         'estado',
+        'direccion_envio',
     ];
 
     public function user(): BelongsTo
