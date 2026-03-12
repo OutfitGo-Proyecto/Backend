@@ -18,8 +18,7 @@ return [
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
-
-    'allowed_origins' => ['http://outfitgo.duckdns.org'],
+    'allowed_origins' => ['*'],
 
     'allowed_origins_patterns' => [],
 
