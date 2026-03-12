@@ -6,7 +6,7 @@ services:
         restart: always                  # Hace que se encienda solo si el servidor se reinicia
         volumes:
             - ./home:/var/www/html       # Monta directorio local en /var/www/html
-        command: tail -f /dev/null # Cambio temporal para que no crashee mientras instalamos dependencias
+        command: sh -c "cd /var/www/html && php artisan serve --host=0.0.0.0 --port=8000"
         ports:
             - "8000:8000"                # Acceso web a Laravel
             - "5173:5173"                # Acceso a Vite (hot reload)
