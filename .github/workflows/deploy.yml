@@ -25,4 +25,4 @@ jobs:
 
             docker-compose up -d --build            
             sleep 40
-            docker-compose exec -T app php artisan migrate --force
+            docker-compose exec -T app php artisan migrate --seed --force
