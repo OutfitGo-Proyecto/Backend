@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->decimal('total', 10, 2);
             $table->string('estado')->default('completado'); // pendiente, completado, cancelado
-            $table->string('direccion_envio')->nullable()->after('estado');
+            $table->string('direccion_envio')->nullable();
             $table->timestamps();
 
         });
