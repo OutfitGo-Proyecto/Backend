@@ -2,7 +2,8 @@ name: Deploy Backend to AWS EC2
 
 on:
   push:
-    branches: [ "main" ] # Asegúrate de que tu rama principal se llame main
+    branches: [ "main" ]
+  workflow_dispatch: {}
 
 jobs:
   deploy:
