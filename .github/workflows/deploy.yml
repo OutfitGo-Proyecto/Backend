@@ -23,22 +23,15 @@ jobs:
             cd /home/ubuntu/backend
             git pull origin main
 
-            # Limpieza suave para no borrar lo que ya ha descargado
-            docker system prune -f
-
-            # Reinicio y construcción
             docker compose down --remove-orphans
-            docker compose up -d --build            
+            docker compose up -d
             
-            # Espera de seguridad
-            sleep 60
+            sleep 40
             
-            # Instalación de librerías (Quitamos --no-dev para tener Faker y poder usar Seeders)
-            docker compose exec -T app composer install --optimize-autoloader
+            docker compose exec -T app composer install
 
-            # Limpiar caché de configuración para que use el DB_HOST correcto
+            # 1. Limpiamos cualquier caché de configuración vieja que tenga el 127.0.0.1 guardado
             docker compose exec -T app php artisan config:clear
 
-            # Engaño a Laravel para que no falle con SQLite y forzamos MySQL
-            docker compose exec -T app touch database/database.sqlite
-            docker compose exec -T app php artisan migrate:fresh --seed --force --database=mysql
+            # 2. FORZAMOS la conexión apuntando directamente al contenedor 'laravel_db'
+            docker compose exec -e DB_HOST=laravel_db -T app php artisan migrate:fresh --seed --force
