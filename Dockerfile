@@ -16,8 +16,12 @@ RUN apt-get update && apt-get install -y \
 # Limpiar caché de apt para reducir el tamaño de la imagen
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Instalar extensiones de PHP requeridas por Laravel
-RUN docker-php-ext-install pdo_mysql mbstring intl pcntl bcmath gd
+# Instalar extensiones de PHP en grupos separados (para no saturar la memoria)
+RUN docker-php-ext-install pdo_mysql mbstring
+RUN docker-php-ext-install intl
+RUN docker-php-ext-install pcntl
+RUN docker-php-ext-install bcmath
+RUN docker-php-ext-install gd
 
 # Instalar Composer (el gestor de paquetes de PHP)
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
