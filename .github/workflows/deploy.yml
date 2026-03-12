@@ -23,22 +23,21 @@ jobs:
             cd /home/ubuntu/backend
             git pull origin main
 
-            # 1. Limpieza de disco agresiva
-            docker system prune -af
+            # Limpieza suave para no borrar lo que ya ha descargado
+            docker system prune -f
 
-            # 2. Borramos la carpeta vendor si existe (por si está corrupta)
-            # y borramos el archivo de bloqueo de docker para que empiece de cero
-            rm -rf vendor
-            
-            # 3. Reinicio total
+            # Reinicio y construcción
             docker compose down --remove-orphans
             docker compose up -d --build            
             
-            # 4. Espera de seguridad para que el contenedor respire
+            # Espera de seguridad
             sleep 60
             
-            # 5. Forzamos la instalación de librerías DESDE FUERA (para que no falle artisan)
+            # Instalación de librerías
             docker compose exec -T app composer install --no-dev --optimize-autoloader
 
+            # Engaño a Laravel para que no falle con SQLite y forzamos MySQL
+            docker compose exec -T app touch database/database.sqlite
+            docker compose exec -T app php artisan migrate:fresh --seed --force --database=mysql
             # 6. Ahora que ya existe 'vendor', artisan ya no dará error
             docker compose exec -T app php artisan migrate:fresh --seed --force
