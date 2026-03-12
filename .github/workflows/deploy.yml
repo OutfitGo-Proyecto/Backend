@@ -22,18 +22,22 @@ jobs:
             cd /home/ubuntu/backend
             git pull origin main
 
-            # 1. LIMPIEZA RADICAL (Borra imágenes y contenedores huérfanos para liberar GBs)
+            # 1. Limpieza de disco agresiva
             docker system prune -af
 
-            # 2. REINICIO TOTAL
+            # 2. Borramos la carpeta vendor si existe (por si está corrupta)
+            # y borramos el archivo de bloqueo de docker para que empiece de cero
+            rm -rf vendor
+            
+            # 3. Reinicio total
             docker compose down --remove-orphans
             docker compose up -d --build            
             
-            # 3. ESPERA DE SEGURIDAD (60 segundos para que MySQL arranque bien)
+            # 4. Espera de seguridad para que el contenedor respire
             sleep 60
             
-            # 4. INSTALACIÓN DE LIBRERÍAS (Arregla el fallo del autoload.php)
-            docker compose exec -T app composer install
+            # 5. Forzamos la instalación de librerías DESDE FUERA (para que no falle artisan)
+            docker compose exec -T app composer install --no-dev --optimize-autoloader
 
-            # 5. CARGA DE PRODUCTOS (Borra todo y mete tus Nike, Adidas, etc.)
+            # 6. Ahora que ya existe 'vendor', artisan ya no dará error
             docker compose exec -T app php artisan migrate:fresh --seed --force
