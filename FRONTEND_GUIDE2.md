@@ -201,3 +201,40 @@ Devuelve los datos del usuario que actualmente tiene sesión activa (muy útil p
 
 ### Protección de Stock
 > ⚠️ **Atención**: El stock **NO** se reserva mientras el producto está en el carrito, ni siquiera cuando el usuario está en Stripe introduciendo sus datos de pago. El stock **se descuenta definitivamente en el Paso 2 (Confirmar Pago)**. Si otro cliente es más rápido comprando la última unidad, Laravel rechazará la confirmación, avisará con un error y no se le cobrará.
+
+
+---
+
+## 📋 ANEXO: Nuevos Campos de Envío (Base de Datos)
+
+Debido a la actualización de la tabla `orders`, el formulario de "Datos de Envío" en Angular ahora debe capturar y enviar obligatoriamente los siguientes campos.
+
+> **Importante**: Estos campos se envían en el **PASO 1** (`POST /api/checkout/iniciar`).
+
+| Campo | Tipo | Descripción |
+| :--- | :--- | :--- |
+| `nombre` | String | Nombre del destinatario. |
+| `apellidos` | String | Apellidos del destinatario. |
+| `telefono` | String | Teléfono de contacto (importante para la mensajería). |
+| `direccion` | String | Calle, número, piso y puerta. |
+| `ciudad` | String | Ciudad de destino. |
+| `provincia` | String | Provincia o región. |
+| `codigo_postal`| String | Código postal (máximo 10 caracteres). |
+| `notas` | Text | *(Opcional)* Notas para el repartidor (ej: "Llamar al timbre 2"). |
+
+**Ejemplo de objeto JSON actualizado para el Checkout:**
+
+```json
+{
+  "nombre": "Ana",
+  "apellidos": "García López",
+  "telefono": "611223344",
+  "direccion": "Avenida de la Constitución 45, 2ºC",
+  "ciudad": "Valencia",
+  "provincia": "Valencia",
+  "codigo_postal": "46001",
+  "notas": "Si no estoy, dejar en el bar de abajo."
+}
+```
+
+> **📌 Nota para Frontend**: Si falta cualquiera de estos campos (excepto `notas`), la API devolverá un error `422 Unprocessable Entity` indicando qué campo falta. Asegúrate de implementar validaciones en el formulario de Angular para que el usuario no deje nada vacío.
