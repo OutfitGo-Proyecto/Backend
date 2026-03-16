@@ -51,7 +51,7 @@ class CheckoutController extends Controller
         try {
             DB::beginTransaction();
 
-            // 3. CREAR EL PEDIDO COMO PENDIENTE (Aún no cobramos ni restamos stock)
+            // 3. CREAR EL PEDIDO COMO PENDIENTE 
             $order = Order::create([
                 'user_id' => $user->id,
                 'total' => $total,
@@ -99,7 +99,7 @@ class CheckoutController extends Controller
                 'metadata' => [
                     'order_id' => $order->id 
                 ],
-                // Ajusta estas URLs a tu frontend. Fíjate que le pasamos el session_id en la URL de éxito
+                // Ajusta estas URLs a tu frontend. Le pasamos el session_id en la URL de éxito
                 'success_url' => 'http://localhost:4200/pago-exitoso?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url' => 'http://localhost:4200/carrito',
             ]);
@@ -116,11 +116,11 @@ class CheckoutController extends Controller
     }
 
     /**
-     * PASO 2: Confirmar la compra (Llamado desde Angular al volver de Stripe)
+     * PASO 2: Confirmar la compra 
      */
     public function confirmarPago(Request $request)
     {
-        // Angular nos tiene que mandar el session_id que le dio Stripe en la URL
+        // Angular manda el session_id que le dio Stripe en la URL
         $request->validate([
             'session_id' => 'required|string',
         ]);
@@ -138,7 +138,7 @@ class CheckoutController extends Controller
             $orderId = $session->metadata->order_id;
             $order = Order::with('orderItems.producto')->findOrFail($orderId);
 
-            // Si el pedido ya estaba pagado (por si Angular recarga la página 2 veces)
+            // Si el pedido ya estaba pagado 
             if ($order->estado === 'pagado') {
                 return response()->json(['message' => 'Este pedido ya estaba confirmado.', 'order' => $order], 200);
             }
