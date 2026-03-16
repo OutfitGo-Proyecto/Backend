@@ -8,12 +8,23 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->decimal('total', 10, 2);
-            $table->string('estado')->default('completado'); // pendiente, completado, cancelado
-            $table->string('direccion_envio')->nullable();
-            $table->timestamps();
+        $table->id();
+        $table->foreignId('user_id')->constrained()->onDelete('cascade');
+        $table->decimal('total', 10, 2);
+        
+        $table->string('estado')->default('pendiente'); 
+
+        // --- DATOS DE ENVÍO ---
+        $table->string('nombre');
+        $table->string('apellidos');
+        $table->string('telefono'); 
+        $table->string('direccion'); 
+        $table->string('ciudad');
+        $table->string('provincia');
+        $table->string('codigo_postal');
+        $table->text('notas')->nullable(); 
+
+        $table->timestamps();
 
         });
     }
@@ -21,8 +32,5 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('orders');
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('direccion_envio');
-        });
     }
 };

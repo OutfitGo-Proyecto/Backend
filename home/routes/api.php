@@ -31,5 +31,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/cart/{id}', [CartController::class, 'destroy']);
 
     // Checkout
-    Route::post('/checkout', [CheckoutController::class, 'store']);
+
+    // 1. Para pedirle el link de Stripe a Laravel
+    Route::post('/checkout/iniciar', [CheckoutController::class, 'iniciarPago']);
+    
+    // 2. Para confirmar la orden en la BD una vez pagado
+    Route::post('/checkout/confirmar', [CheckoutController::class, 'confirmarPago']);
+
 });
