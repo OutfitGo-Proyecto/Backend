@@ -52,4 +52,10 @@ class Producto extends Model
         }
         return $query;
     }
+
+    protected $fillable = [
+    'nombre', 'slug', 'descripcion', 'publico', 
+    'url_imagen_principal', 'precio', 'stock', 
+    'marca_id', 'categoria_id'
+];
 }

@@ -21,6 +21,14 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password'),
         ]);
 
+        //Creo Usuario Administrador de productos
+        User::factory()->create([
+            'name' => 'Admin Productos',
+            'email' => 'adminProductos@gmail.com',
+            'password' => bcrypt('productos123'),
+        ]);
+        
+
         // 2. Crear Categorías Reales
         $categorias = [
             'Zapatillas' => Categoria::create(['nombre' => 'Zapatillas', 'slug' => 'zapatillas']),
