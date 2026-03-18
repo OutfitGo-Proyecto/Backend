@@ -15,6 +15,8 @@ Route::get('/productos/{slug}', [ProductoController::class, 'show']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+
+
 // Rutas Privadas (Requieren Autenticación)
 Route::middleware('auth:sanctum')->group(function () {
     // Usuario autenticado actual
@@ -37,5 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // 2. Para confirmar la orden en la BD una vez pagado
     Route::post('/checkout/confirmar', [CheckoutController::class, 'confirmarPago']);
+
+
+
+    // Historial de pedidos
+    Route::get('/pedidos', [PedidoController::class, 'misPedidos']);    
 
 });

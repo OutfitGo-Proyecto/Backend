@@ -30,9 +30,16 @@ Estos endpoints **no requieren token** (su propósito es generar o destruir toke
   "name": "Juan Perez",
   "email": "juan@example.com",
   "password": "Password123!",
-  "password_confirmation": "Password123!"
+  "password_confirmation": "Password123!",
+  "direccion": "Calle Falsa 123, 3ºB",
+  "ciudad": "Madrid",
+  "provincia": "Madrid",
+  "codigo_postal": "28080",
+  "telefono": "600123456"
 }
 ```
+
+> **📌 Nota Frontend**: Los campos de dirección (`direccion`, `ciudad`, `provincia`, `codigo_postal` y `telefono`) son opcionales durante el registro, pero muy recomendables para acelerar el proceso de compra (checkout) posterior.
 
 * **Respuesta Exitosa (`201 Created`)**: Devuelve el objeto del usuario y el token de acceso.
 
@@ -177,7 +184,44 @@ Estos endpoints **no requieren token** (su propósito es generar o destruir toke
 
 ---
 
-## 🚪 4. Otros Endpoints Útiles (Privados 🔒)
+## 📦 4. Historial de Pedidos (Privados 🔒)
+
+> **Requieren Header**: `Authorization: Bearer {token}`
+
+### 4.1 Obtener Historial
+**`GET /api/pedidos`**
+
+* **Funcionalidad**: Devuelve un listado completo con el historial de pedidos del usuario que ha iniciado sesión (ordenados del más reciente al más antiguo).
+* **Respuestas Exitosas (`200 OK`)**:
+
+**Si el usuario NO tiene pedidos:**
+```json
+{
+    "message": "Aún no tienes pedidos en tu historial.",
+    "pedidos": []
+}
+```
+
+**Si el usuario SÍ tiene pedidos:**
+```json
+{
+    "message": "Historial de pedidos recuperado con éxito.",
+    "pedidos": [
+        {
+            "id": 1,
+            "user_id": 3,
+            "total": "120.50",
+            "estado": "pagado",
+            "created_at": "2026-03-18T10:00:00.000000Z",
+            "updated_at": "2026-03-18T10:00:00.000000Z"
+        }
+    ]
+}
+```
+
+---
+
+## 🚪 5. Otros Endpoints Útiles (Privados 🔒)
 
 ### Cerrar Sesión (Destruir Token)
 **`POST /api/logout`**
