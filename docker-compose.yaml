@@ -1,42 +1,67 @@
 services:
     app:
         build: .
-        container_name: laravel          # Nombre del contenedor
-        tty: true                        # Asigna un terminal virtual al contenedor
-        restart: always                  # Hace que se encienda solo si el servidor se reinicia
+        container_name: laravel
+        tty: true
+        restart: always
         volumes:
-            - ./home:/var/www/html       # Monta directorio local en /var/www/html
+            - ./home:/var/www/html
         command: sh -c "cd /var/www/html && php artisan serve --host=0.0.0.0 --port=8000"
-        ports:
-            - "8000:8000"                # Acceso web a Laravel
-            - "5173:5173"                # Acceso a Vite (hot reload)
         depends_on:
-            - db                         # Depende del servicio de base de datos
+            - db
+
+    nginx:
+        image: nginx:stable-alpine
+        container_name: laravel_nginx
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - ./docker/certs:/etc/nginx/certs
+            - certbot_etc:/etc/letsencrypt
+            - certbot_var:/var/lib/letsencrypt
+            - ./docker/certbot/www:/var/www/certbot
+        depends_on:
+            - app
+
+    certbot:
+        image: certbot/certbot
+        container_name: laravel_certbot
+        volumes:
+            - certbot_etc:/etc/letsencrypt
+            - certbot_var:/var/lib/letsencrypt
+            - ./docker/certbot/www:/var/www/certbot
+        depends_on:
+            - nginx
 
     db:
-        image: mysql:8.0                 # MySQL o MariaDB
-        container_name: laravel_db       # Nombre del contenedor
-        restart: always                  # Hace que se encienda solo si el servidor se reinicia
+        image: mysql:8.0
+        container_name: laravel_db
+        restart: always
         volumes:
-            - db_data:/var/lib/mysql     # Persistencia de datos
+            - db_data:/var/lib/mysql
         environment:
-            MYSQL_ROOT_PASSWORD: root    # Contraseña usuario root
-            MYSQL_DATABASE: laravel      # Nombre de la base de datos
-            MYSQL_USER: dwes             # Nombre de usuario
-            MYSQL_PASSWORD: dwes         # Contraseña del usuario
-
-volumes:
-    db_data:                             # Definición del volumen
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: laravel
+            MYSQL_USER: dwes
+            MYSQL_PASSWORD: dwes
 
     phpmyadmin:
-        image: phpmyadmin/phpmyadmin     # Imagen PHPMyAdmin
-        container_name: laravel_pma      # Nombre del contenedor
-        restart: always                  # Hace que se encienda solo si el servidor se reinicia
+        image: phpmyadmin/phpmyadmin
+        container_name: laravel_pma
+        restart: always
         environment:
-            PMA_HOST: db                 # Nombre del servicio host de base de datos
-            PMA_USER: root               # Usuario para login
-            PMA_PASSWORD: root           # Contraseña para login
+            PMA_HOST: db
+            PMA_USER: root
+            PMA_PASSWORD: root
         ports:
-            - "8080:80"                  # Se accede a través del puerto 8080
+            - "8080:80"
         depends_on:
-            - db                         # Depende del servicio db
+            - db
+
+volumes:
+    db_data:
+    certbot_etc:
+    certbot_var:
