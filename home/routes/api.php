@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\Api\PedidoController;
+use App\Http\Controllers\Api\FavoriteController;
 
 // Rutas Públicas de Productos
 Route::get('/productos', [ProductoController::class, 'index']);
@@ -52,5 +53,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Devolver pedido
     Route::post('/pedidos/{id}/devolver', [PedidoController::class, 'devolverPedido']);
 
-
+    // Favoritos
+    Route::get('/favorites', [FavoriteController::class, 'index']);
+    Route::post('/favorites', [FavoriteController::class, 'store']);
+    Route::delete('/favorites/{id}', [FavoriteController::class, 'destroy']);
 });

@@ -35,6 +35,11 @@ class Producto extends Model
         return $this->hasMany(ImagenProducto::class);
     }
 
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
     public function scopeAdulto($query)
     {
         return $query->where('publico', 'adulto');
