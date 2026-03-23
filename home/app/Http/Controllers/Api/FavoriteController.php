@@ -16,7 +16,7 @@ class FavoriteController extends Controller
     {
         // Obtenemos los favoritos cargando la relación con el producto y sus imágenes
         $favorites = $request->user()->favorites()
-            ->with(['producto.marca', 'producto.categoria', 'producto.imagenes'])
+            ->with(['producto.marca', 'producto.categoria', 'producto.imagenes', 'producto.colores', 'producto.tallas'])
             ->latest()
             ->get();
 
