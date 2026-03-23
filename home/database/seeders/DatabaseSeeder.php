@@ -231,6 +231,13 @@ class DatabaseSeeder extends Seeder
             // Sincronizar relaciones
             $producto->tallas()->sync($pData['tallas']);
             $producto->colores()->sync($pData['colores']);
+            
+            // 🌟 AÑADIDO: Generar 3 imágenes secundarias
+            for ($i = 1; $i <= 3; $i++) {
+                $producto->imagenes()->create([
+                    'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . '/800/800'
+                ]);
+            }
         }
 
         // Ya que solo hemos creado 10 productos exactos para respetar las reglas de negocio estrictamente, 
@@ -289,6 +296,13 @@ class DatabaseSeeder extends Seeder
             // Sincronizar relaciones
             $producto->tallas()->sync(isset($clone['tallas']) ? $clone['tallas'] : $base['tallas']);
             $producto->colores()->sync(isset($clone['colores']) ? $clone['colores'] : $base['colores']);
+
+            // 🌟 AÑADIDO: Generar 3 imágenes secundarias para los clones
+            for ($i = 1; $i <= 3; $i++) {
+                $producto->imagenes()->create([
+                    'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . 'clone/800/800'
+                ]);
+            }
         }
 
 

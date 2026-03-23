@@ -30,6 +30,11 @@ class Producto extends Model
         return $this->belongsToMany(Color::class, 'producto_color');
     }
 
+    public function imagenes()
+    {
+        return $this->hasMany(ImagenProducto::class);
+    }
+
     public function scopeAdulto($query)
     {
         return $query->where('publico', 'adulto');

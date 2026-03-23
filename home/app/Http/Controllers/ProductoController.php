@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Categoria;
 use App\Models\Producto;
+use App\Models\Marca;
+use App\Models\Color;
+use App\Models\Talla;
 use Illuminate\Http\Request;
 
 class ProductoController extends Controller
 {
-    /**
-     * Muestra el catálogo completo o los resultados de búsqueda con filtros.
-     */
     public function index(Request $request)
     {
         $query = Producto::query();
@@ -26,9 +27,8 @@ class ProductoController extends Controller
         }
 
         // 2. Filtros
-        // Filtro por Público (adulto, infantil, unisex)
         if ($request->filled('publico')) {
-            $query->publico($request->publico);
+            $query->where('publico', $request->publico); // Corregido: 'where' estándar en vez de scope por si acaso
         }
 
         if ($request->filled('marca_id')) {
@@ -39,7 +39,6 @@ class ProductoController extends Controller
             $query->where('categoria_id', $request->categoria_id);
         }
 
-        // Filtro por Tallas (acepta múltiples separadas por coma: ?talla=S,M)
         if ($request->filled('talla')) {
             $tallas = explode(',', $request->talla);
             $query->whereHas('tallas', function($q) use ($tallas) {
@@ -47,7 +46,6 @@ class ProductoController extends Controller
             });
         }
 
-        // Filtro por Colores (acepta múltiples: ?color=Rojo,Azul)
         if ($request->filled('color')) {
             $colores = explode(',', $request->color);
             $query->whereHas('colores', function($q) use ($colores) {
@@ -55,7 +53,6 @@ class ProductoController extends Controller
             });
         }
 
-        // Filtro por Rango de Precio
         if ($request->filled('precio_min')) {
             $query->where('precio', '>=', $request->precio_min);
         }
@@ -64,21 +61,49 @@ class ProductoController extends Controller
             $query->where('precio', '<=', $request->precio_max);
         }
 
-        // 3. Cargar relaciones y paginar
-        $productos = $query->with(['marca', 'categoria', 'tallas', 'colores'])
+        // 🌟 3. MAGIA FACETADA: Clonamos la query ANTES de paginar
+        $facetQuery = clone $query;
+        $idsProductosVivos = $facetQuery->select('productos.id');
+
+        $categoriasDisponibles = Categoria::whereHas('productos', function($q) use ($idsProductosVivos) {
+            $q->whereIn('productos.id', $idsProductosVivos);
+        })->get(['id', 'nombre']);
+
+        $marcasDisponibles = Marca::whereHas('productos', function($q) use ($idsProductosVivos) {
+            $q->whereIn('productos.id', $idsProductosVivos);
+        })->get(['id', 'nombre']);
+
+        $coloresDisponibles = Color::whereHas('productos', function($q) use ($idsProductosVivos) {
+            $q->whereIn('productos.id', $idsProductosVivos);
+        })->get(['id', 'nombre']);
+
+        $tallasDisponibles = Talla::whereHas('productos', function($q) use ($idsProductosVivos) {
+            $q->whereIn('productos.id', $idsProductosVivos);
+        })->get(['id', 'nombre']);
+
+        // 4. Cargar relaciones y paginar
+        $productos = $query->with(['marca', 'categoria', 'tallas', 'colores', 'imagenes'])
                            ->latest()
                            ->paginate(12);
 
-        return response()->json($productos);
+        // 5. Estructurar respuesta con las facetas
+        return response()->json([
+            'current_page' => $productos->currentPage(),
+            'data' => $productos->items(),
+            'total' => $productos->total(),
+            'filtros_disponibles' => [
+                'categorias' => $categoriasDisponibles,
+                'marcas' => $marcasDisponibles,
+                'colores' => $coloresDisponibles,
+                'tallas' => $tallasDisponibles,
+            ]
+        ]);
     }
 
-    /**
-     * Muestra la ficha de un producto específico.
-     */
     public function show($slug)
     {
         $producto = Producto::where('slug', $slug)
-            ->with(['marca', 'categoria', 'tallas', 'colores'])
+            ->with(['marca', 'categoria', 'tallas', 'colores', 'imagenes']) // <-- AÑADIDO 'imagenes'
             ->firstOrFail();
 
         return response()->json($producto);
