@@ -22,4 +22,6 @@ Route::get('/admin/logout', [AuthController::class, 'logout'])->name('admin.logo
 // Rutas para el Panel de Administrador
 Route::prefix('admin')->middleware(AdminAuth::class)->group(function () {
     Route::resource('productos', AdminProductoController::class);
+    Route::put('/pedidos/{id}/aprobar-devolucion', [AdminProductoController::class, 'aprobarDevolucion'])
+    ->name('admin.pedidos.aprobar-devolucion');
 });

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\Api\PedidoController;
 
 // Rutas Públicas de Productos
 Route::get('/productos', [ProductoController::class, 'index']);
@@ -44,5 +45,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Historial de pedidos
     Route::get('/pedidos', [PedidoController::class, 'misPedidos']);    
+
+    // Cancelar pedido
+    Route::post('/pedidos/{id}/cancelar', [PedidoController::class, 'cancelarPedido']);
+        
+    // Devolver pedido
+    Route::post('/pedidos/{id}/devolver', [PedidoController::class, 'devolverPedido']);
+
 
 });

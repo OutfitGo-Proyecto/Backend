@@ -82,6 +82,15 @@
                             </form>
                         </td>
                     </tr>
+                    @if($producto->estado === 'devolucion_solicitada')
+                        <form action="{{ route('admin.pedidos.aprobar-devolucion', $producto->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Confirmar que el paquete ha llegado bien? Se devolverá el stock.');">
+                            @csrf
+                            @method('PUT')
+                            <button type="submit" class="btn btn-success btn-sm">
+                                Aprobar Devolución
+                            </button>
+                        </form>
+                    @endif
                 @empty
                     <tr>
                         <td colspan="6" class="p-3 border-b text-center text-gray-500">No hay productos en la base de datos.</td>

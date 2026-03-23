@@ -11,6 +11,8 @@ use App\Models\Marca;
 use App\Models\Categoria;  
 use App\Models\Talla;
 use App\Models\Color;
+use App\Models\Order;
+
 
 class ProductoController extends Controller
 {
@@ -154,5 +156,28 @@ class ProductoController extends Controller
 
         // 5. Volvemos a la tabla con un mensaje verde
         return redirect('/admin/productos')->with('success', '¡Producto eliminado correctamente!');
+    }
+
+    public function aprobarDevolucion($id)
+    {
+        $pedido = Order::with('orderItems')->findOrFail($id);
+
+        if ($pedido->estado !== 'devolucion_solicitada') {
+             return redirect()->back()->with('error', 'Este pedido no está pendiente de devolución.');
+        }
+
+        // 1. Cambiamos el estado final
+        $pedido->estado = 'devuelto';
+        $pedido->save();
+
+        // 2. Devolvemos el stock a los productos de la tienda
+        foreach ($pedido->orderItems as $item) {
+            $producto = \App\Models\Producto::find($item->producto_id);
+            if ($producto) {
+                $producto->increment('stock', $item->cantidad);
+            }
+        }
+
+        return redirect()->back()->with('success', '📦 ¡Paquete recibido, devolución aprobada y stock restaurado!');
     }
 }
