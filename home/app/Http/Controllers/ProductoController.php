@@ -82,7 +82,7 @@ class ProductoController extends Controller
         })->get(['id', 'nombre']);
 
         // 4. Cargar relaciones y paginar
-        $productos = $query->with(['marca', 'categoria', 'tallas', 'colores'])
+        $productos = $query->with(['marca', 'categoria', 'tallas', 'colores', 'imagenes'])
                            ->latest()
                            ->paginate(12);
 
@@ -103,7 +103,7 @@ class ProductoController extends Controller
     public function show($slug)
     {
         $producto = Producto::where('slug', $slug)
-            ->with(['marca', 'categoria', 'tallas', 'colores'])
+            ->with(['marca', 'categoria', 'tallas', 'colores', 'imagenes']) // <-- AÑADIDO 'imagenes'
             ->firstOrFail();
 
         return response()->json($producto);
