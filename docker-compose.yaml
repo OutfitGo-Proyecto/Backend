@@ -27,6 +27,7 @@ services:
       - certbot_etc:/etc/letsencrypt
       - certbot_var:/var/lib/letsencrypt
       - ./docker/certbot/www:/var/www/certbot
+      - ../frontend:/var/www/html/frontend:ro
     depends_on:
       - app
 
