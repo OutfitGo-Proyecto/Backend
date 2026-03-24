@@ -1,6 +1,8 @@
 services:
     app:
         build: .
+            context: ./home
+            dockerfile: Dockerfile
         container_name: laravel
         tty: true
         restart: always
