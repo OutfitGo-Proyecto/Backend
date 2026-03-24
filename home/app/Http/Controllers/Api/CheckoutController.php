@@ -100,8 +100,8 @@ class CheckoutController extends Controller
                     'order_id' => $order->id 
                 ],
                 // Ajusta estas URLs a tu frontend. Le pasamos el session_id en la URL de éxito
-                'success_url' => 'http://52.4.105.78/pago-exitoso?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => 'http://52.4.105.78/carrito',
+                'success_url' => 'https://52.4.105.78/pago-exitoso?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url' => 'https://52.4.105.78/carrito',
             ]);
 
             DB::commit();

@@ -4,7 +4,7 @@ Bienvenido al Backend de OutfitGo (Core Engine v2.0). Esta guía está diseñada
 
 ## 🌐 Configuración Base
 
-*   **URL Base de la API**: `http://52.4.105.78/api`
+*   **URL Base de la API**: `https://52.4.105.78/api`
 *   **CORS**: Actualmente configurado con `allowed_origins => ['*']`. Puedes hacer peticiones desde tu entorno local (`localhost:4200`) o staging sin enfrentarte a problemas de preflight (bloqueos CORS).
 *   **Autenticación**: Por el momento, el catálogo de productos es **Público**. No se requiere token de Sanctum/JWT ni cabeceras de `Authorization` para consumir los endpoints de lectura (`GET /api/productos`).
 

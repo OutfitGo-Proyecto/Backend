@@ -8,7 +8,7 @@ Bienvenido al módulo de compras de **OutfitGo**. Esta guía complementa a la gu
 
 ## 🌐 Configuración Base de Seguridad y Tokens
 
-- **URL Base de la API**: Usa la misma URL base (`http://localhost:8000/api` para entorno local) o `http://52.4.105.78/api` si la máquina está encendida en producción.
+- **URL Base de la API**: Usa la misma URL base (`http://localhost:8000/api` para entorno local) o `https://52.4.105.78/api` si la máquina está encendida en producción.
 - **Mecanismo de Autenticación**: Laravel Sanctum. A diferencia de las rutas del catálogo que son públicas, las rutas de compras **requieren un Token de Acceso**.
 - **Cabecera Obligatoria**: Una vez logueado el usuario, todas las peticiones a rutas privadas (Carrito y Checkout) deben enviar el siguiente header:
   ```http
