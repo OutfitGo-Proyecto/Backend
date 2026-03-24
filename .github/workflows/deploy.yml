@@ -34,11 +34,11 @@ jobs:
             sudo chmod -R 775 home/storage home/bootstrap/cache
 
             # 4. Instalación de librerías dentro del contenedor
-            sudo docker compose exec -T app composer install --no-dev --optimize-autoloader
+            sudo docker compose exec -T app composer install --optimize-autoloader
 
             # 5. Configuración de Laravel
             sudo docker compose exec -T app php artisan config:clear
             sudo docker compose exec -T app php artisan key:generate --force
 
-            # 6. Base de datos: Migración
-            sudo docker compose exec -e DB_HOST=laravel_db -T app php artisan migrate:fresh --seed --force
+            # 6. Base de datos: Migración (Para que no se borre la base de datos cada vea que )
+            sudo docker compose exec -e DB_HOST=laravel_db -T app php artisan migrate --force
