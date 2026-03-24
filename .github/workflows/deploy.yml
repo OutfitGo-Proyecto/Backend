@@ -23,15 +23,22 @@ jobs:
             cd /home/ubuntu/backend
             git pull origin main
 
-            docker compose down --remove-orphans
-            docker compose up -d
+            # 1. Reiniciamos contenedores con la nueva estructura
+            sudo docker compose down --remove-orphans
+            sudo docker compose up -d --build
             
-            sleep 40
+            sleep 45
             
-            docker compose exec -T app composer install
+            # 3. Arreglo de permisos
+            sudo chown -R ubuntu:www-data home/storage home/bootstrap/cache
+            sudo chmod -R 775 home/storage home/bootstrap/cache
 
-            # 1. Limpiamos cualquier caché de configuración vieja que tenga el 127.0.0.1 guardado
-            docker compose exec -T app php artisan config:clear
+            # 4. Instalación de librerías dentro del contenedor
+            sudo docker compose exec -T app composer install --no-dev --optimize-autoloader
 
-            # 2. FORZAMOS la conexión apuntando directamente al contenedor 'laravel_db'
-            docker compose exec -e DB_HOST=laravel_db -T app php artisan migrate:fresh --seed --force
+            # 5. Configuración de Laravel
+            sudo docker compose exec -T app php artisan config:clear
+            sudo docker compose exec -T app php artisan key:generate --force
+
+            # 6. Base de datos: Migración
+            sudo docker compose exec -e DB_HOST=laravel_db -T app php artisan migrate:fresh --seed --force
