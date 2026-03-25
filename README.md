@@ -32,8 +32,8 @@ El sistema utiliza una estructura relacional optimizada para ropa y calzado, per
 
 1.  **Clonar el repositorio**:
     ```bash
-    git clone https://github.com/tu-usuario/Backend-OutfitGo.git
-    cd Backend-OutfitGo
+    git clone https://github.com/OutfitGo-Proyecto/Backend.git
+    cd Backend
     ```
 
 2.  **Iniciar los contenedores Docker**:

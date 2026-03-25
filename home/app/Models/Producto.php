@@ -30,6 +30,16 @@ class Producto extends Model
         return $this->belongsToMany(Color::class, 'producto_color');
     }
 
+    public function imagenes()
+    {
+        return $this->hasMany(ImagenProducto::class);
+    }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
     public function scopeAdulto($query)
     {
         return $query->where('publico', 'adulto');
@@ -52,4 +62,10 @@ class Producto extends Model
         }
         return $query;
     }
+
+    protected $fillable = [
+    'nombre', 'slug', 'descripcion', 'publico', 
+    'url_imagen_principal', 'precio', 'stock', 
+    'marca_id', 'categoria_id'
+];
 }

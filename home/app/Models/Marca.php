@@ -9,4 +9,9 @@ class Marca extends Model
 {
     /** @use HasFactory<\Database\Factories\MarcaFactory> */
     use HasFactory;
+
+    public function productos()
+    {
+        return $this->hasMany(Producto::class);
+    }
 }

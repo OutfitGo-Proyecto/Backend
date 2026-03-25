@@ -22,6 +22,11 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'direccion',
+        'ciudad',
+        'provincia',
+        'codigo_postal',
+        'telefono',
     ];
 
     /**
@@ -61,5 +66,13 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Relación con Favoritos
+     */
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
     }
 }

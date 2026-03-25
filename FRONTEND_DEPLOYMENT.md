@@ -46,7 +46,7 @@ jobs:
 
 ### ✅ Secretos Necesarios en tu Repositorio de GitHub
 Para que el workflow anterior funcione, debes ir a **Settings > Secrets and variables > Actions** en tu repositorio Frontend de GitHub y configurar estos 3 secretos:
-*   `SERVER_IP`: La IP de nuestra instancia en AWS (`34.229.141.169`).
+*   `SERVER_IP`: La IP de nuestra instancia en AWS (`52.4.105.78`).
 *   `SERVER_USER`: Tu usuario de SSH (ej. `ubuntu`).
 *   `SERVER_SSH_KEY`: La clave privada `.pem` completa (con todo y las cabeceras `-----BEGIN RSA PRIVATE KEY-----`).
 
