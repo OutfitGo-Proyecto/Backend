@@ -70,6 +70,35 @@ class CartController extends Controller
     }
 
     /**
+     * Actualizar la cantidad de un producto en el carrito.
+     */
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'cantidad' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $cartItem = CartItem::where('user_id', $request->user()->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $producto = $cartItem->producto;
+
+        if ($producto->stock < $request->cantidad) {
+            return response()->json([
+                'message' => 'No hay suficiente stock disponible.',
+            ], 422);
+        }
+
+        $cartItem->update(['cantidad' => $request->cantidad]);
+
+        return response()->json([
+            'message' => 'Cantidad actualizada exitosamente',
+            'item' => new CartItemResource($cartItem),
+        ]);
+    }
+
+    /**
      * Eliminar un item del carrito.
      */
     public function destroy(Request $request, $id)
