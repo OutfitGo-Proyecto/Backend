@@ -5,63 +5,69 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CartItemResource;
 use App\Models\CartItem;
-use App\Models\Producto;
+use App\Models\ProductoVariante;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
-    /**
-     * Ver el carrito del usuario autenticado.
-     */
     public function index(Request $request)
     {
-        $cartItems = CartItem::with('producto')
+        // Cargamos la variante y, a través de ella, su producto, talla y color
+        $cartItems = CartItem::with(['variante.producto', 'variante.color', 'variante.talla'])
             ->where('user_id', $request->user()->id)
             ->get();
 
         return CartItemResource::collection($cartItems);
     }
 
-    /**
-     * Añadir un producto al carrito.
-     */
     public function store(Request $request)
     {
+        // 1. Ahora validamos que Angular nos mande talla y color
         $request->validate([
             'producto_id' => ['required', 'exists:productos,id'],
+            'color' => ['required', 'string'],
+            'talla' => ['required', 'string'],
             'cantidad' => ['required', 'integer', 'min:1'],
         ]);
 
-        $producto = Producto::findOrFail($request->producto_id);
+        // 2. Buscamos la variante exacta en la base de datos
+        $variante = ProductoVariante::where('producto_id', $request->producto_id)
+            ->whereHas('color', function($q) use ($request) {
+                $q->where('nombre', $request->color);
+            })
+            ->whereHas('talla', function($q) use ($request) {
+                $q->where('nombre', $request->talla);
+            })
+            ->first();
 
-        if ($producto->stock < $request->cantidad) {
-            return response()->json([
-                'message' => 'No hay suficiente stock disponible para este producto.',
-            ], 422);
+        if (!$variante) {
+            return response()->json(['message' => 'Esta combinación de talla y color no existe.'], 404);
+        }
+
+        // 3. Comprobamos el stock DE LA VARIANTE
+        if ($variante->stock < $request->cantidad) {
+            return response()->json(['message' => 'No hay suficiente stock para esta talla y color.'], 422);
         }
 
         $cartItem = CartItem::where('user_id', $request->user()->id)
-            ->where('producto_id', $request->producto_id)
+            ->where('producto_variante_id', $variante->id)
             ->first();
 
         if ($cartItem) {
             $nuevaCantidad = $cartItem->cantidad + $request->cantidad;
-            if ($producto->stock < $nuevaCantidad) {
-                return response()->json([
-                    'message' => 'No hay suficiente stock disponible para agregar esta cantidad.',
-                ], 422);
+            if ($variante->stock < $nuevaCantidad) {
+                return response()->json(['message' => 'Stock insuficiente para añadir más.'], 422);
             }
             $cartItem->update(['cantidad' => $nuevaCantidad]);
         } else {
             $cartItem = CartItem::create([
                 'user_id' => $request->user()->id,
-                'producto_id' => $request->producto_id,
+                'producto_variante_id' => $variante->id,
                 'cantidad' => $request->cantidad,
             ]);
         }
 
-        // Cargar la relación producto antes de devolver el recurso
-        $cartItem->load('producto');
+        $cartItem->load(['variante.producto', 'variante.color', 'variante.talla']);
 
         return response()->json([
             'message' => 'Producto añadido al carrito exitosamente',

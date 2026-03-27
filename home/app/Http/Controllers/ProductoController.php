@@ -103,7 +103,7 @@ class ProductoController extends Controller
     public function show($slug)
     {
         $producto = Producto::where('slug', $slug)
-            ->with(['marca', 'categoria', 'tallas', 'colores', 'imagenes']) // <-- AÑADIDO 'imagenes'
+            ->with(['marca', 'categoria', 'tallas', 'colores', 'imagenes', 'variantes.talla', 'variantes.color'])
             ->firstOrFail();
 
         return response()->json($producto);

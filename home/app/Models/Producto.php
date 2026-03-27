@@ -63,6 +63,11 @@ class Producto extends Model
         return $query;
     }
 
+    public function variantes()
+    {
+        return $this->hasMany(ProductoVariante::class);
+    }
+
     protected $fillable = [
     'nombre', 'slug', 'descripcion', 'publico', 
     'url_imagen_principal', 'precio', 'stock', 

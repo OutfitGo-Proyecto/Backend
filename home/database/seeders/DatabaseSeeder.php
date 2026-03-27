@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Marca;
 use App\Models\Categoria;
 use App\Models\Producto;
+use App\Models\ProductoVariante;
 use App\Models\Talla;
 use App\Models\Color;
 use Illuminate\Database\Seeder;
@@ -84,9 +85,6 @@ class DatabaseSeeder extends Seeder
         ];
 
         // 6. CREAR PRODUCTOS REALISTAS COMPLETOS
-        // Definiremos la lista estática y se iterará sobre ella para insertarla preservando las relaciones
-        
-        // Función ayudante para formatear slug
         $makeSlug = function($string) {
             return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $string), '-'));
         };
@@ -214,7 +212,7 @@ class DatabaseSeeder extends Seeder
             ]
         ];
 
-        // 7. Insertar los productos comprobando datos
+        // 7. Insertar los productos y SUS VARIANTES
         foreach ($productosReales as $pData) {
             $producto = Producto::create([
                 'nombre' => $pData['nombre'],
@@ -223,26 +221,40 @@ class DatabaseSeeder extends Seeder
                 'publico' => $pData['publico'],
                 'url_imagen_principal' => $pData['url_imagen_principal'],
                 'precio' => $pData['precio'],
-                'stock' => $pData['stock'],
+                'stock' => $pData['stock'], // Lo mantenemos como informativo
                 'marca_id' => $pData['marca'],
                 'categoria_id' => $pData['categoria'],
             ]);
 
-            // Sincronizar relaciones
+            // Sincronizar relaciones pivote
             $producto->tallas()->sync($pData['tallas']);
             $producto->colores()->sync($pData['colores']);
+
+            // 🌟 AÑADIDO: CREAR LAS VARIANTES DE STOCK
+            // 🌟 CREAR LAS VARIANTES CON STOCK MUY VARIADO PARA PRUEBAS
+            foreach ($pData['tallas'] as $tallaId) {
+                foreach ($pData['colores'] as $colorId) {
+                    
+                    // Truco matemático: 1 de cada 4 variantes tendrá stock 0 (Agotado), 
+                    // el resto tendrá un número aleatorio muy dispar entre 1 y 150.
+                    $stockDemo = (rand(1, 4) === 1) ? 0 : rand(1, 150);
+
+                    ProductoVariante::create([
+                        'producto_id' => $producto->id,
+                        'talla_id' => $tallaId,
+                        'color_id' => $colorId,
+                        'stock' => $stockDemo
+                    ]);
+                }
+            }
             
-            // 🌟 AÑADIDO: Generar 3 imágenes secundarias
+            // Generar 3 imágenes secundarias
             for ($i = 1; $i <= 3; $i++) {
                 $producto->imagenes()->create([
                     'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . '/800/800'
                 ]);
             }
         }
-
-        // Ya que solo hemos creado 10 productos exactos para respetar las reglas de negocio estrictamente, 
-        // podemos generar algunos adicionales para abultar, utilizando los datos realistas que ya escribimos para clonarlos
-        // y generar variaciones para alcanzar el objetivo aproximado de 15 productos que mencionamos.
 
         $clonesData = [
             [
@@ -279,6 +291,7 @@ class DatabaseSeeder extends Seeder
             ]
         ];
 
+        // 8. Insertar los clones y SUS VARIANTES
         foreach ($clonesData as $clone) {
             $base = $clone['base'];
             $producto = Producto::create([
@@ -293,11 +306,25 @@ class DatabaseSeeder extends Seeder
                 'categoria_id' => $base['categoria'],
             ]);
 
-            // Sincronizar relaciones
-            $producto->tallas()->sync(isset($clone['tallas']) ? $clone['tallas'] : $base['tallas']);
-            $producto->colores()->sync(isset($clone['colores']) ? $clone['colores'] : $base['colores']);
+            $tallasAUsar = isset($clone['tallas']) ? $clone['tallas'] : $base['tallas'];
+            $coloresAUsar = isset($clone['colores']) ? $clone['colores'] : $base['colores'];
 
-            // 🌟 AÑADIDO: Generar 3 imágenes secundarias para los clones
+            // Sincronizar relaciones pivote
+            $producto->tallas()->sync($tallasAUsar);
+            $producto->colores()->sync($coloresAUsar);
+
+            // 🌟 AÑADIDO: CREAR LAS VARIANTES DE STOCK PARA LOS CLONES
+            foreach ($tallasAUsar as $tallaId) {
+                foreach ($coloresAUsar as $colorId) {
+                    ProductoVariante::create([
+                        'producto_id' => $producto->id,
+                        'talla_id' => $tallaId,
+                        'color_id' => $colorId,
+                        'stock' => rand(5, 25)
+                    ]);
+                }
+            }
+
             for ($i = 1; $i <= 3; $i++) {
                 $producto->imagenes()->create([
                     'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . 'clone/800/800'
@@ -305,7 +332,6 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-
-        echo "✅ Base de datos poblada con éxito con catálogos hiper-realistas: Mascotas, Marcas, Categorias, Tallas, Colores y Productos.\n";
+        echo "✅ Base de datos poblada con éxito con catálogos hiper-realistas y SKUs de Variantes generados.\n";
     }
 }

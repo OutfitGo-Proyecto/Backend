@@ -30,7 +30,8 @@ class CheckoutController extends Controller
         ]);
 
         $user = $request->user();
-        $cartItems = CartItem::with('producto')->where('user_id', $user->id)->get();
+        // Cargamos la variante y sus detalles
+        $cartItems = CartItem::with(['variante.producto', 'variante.color', 'variante.talla'])->where('user_id', $user->id)->get();
 
         if ($cartItems->isEmpty()) {
             return response()->json(['message' => 'El carrito está vacío.'], 400);
@@ -38,14 +39,14 @@ class CheckoutController extends Controller
 
         $total = 0;
         
-        // 2. Verificar stock antes de dejarle ir a pagar
+        // 2. Verificar stock de la variante antes de dejarle ir a pagar
         foreach ($cartItems as $item) {
-            if ($item->producto->stock < $item->cantidad) {
+            if ($item->variante->stock < $item->cantidad) {
                 return response()->json([
-                    'message' => "Stock insuficiente para: {$item->producto->nombre}"
+                    'message' => "Stock insuficiente para: {$item->variante->producto->nombre} (Talla: {$item->variante->talla->nombre})"
                 ], 422);
             }
-            $total += $item->producto->precio * $item->cantidad;
+            $total += $item->variante->producto->precio * $item->cantidad;
         }
 
         try {
@@ -66,12 +67,12 @@ class CheckoutController extends Controller
                 'notas' => $request->notas,
             ]);
 
-            // Guardamos los productos en el pedido
+            // GUARDAMOS LA VARIANTE
             foreach ($cartItems as $item) {
                 $order->orderItems()->create([
-                    'producto_id' => $item->producto_id,
+                    'producto_variante_id' => $item->producto_variante_id,
                     'cantidad' => $item->cantidad,
-                    'precio_unitario' => $item->producto->precio,
+                    'precio_unitario' => $item->variante->producto->precio,
                 ]);
             }
 
@@ -83,8 +84,8 @@ class CheckoutController extends Controller
                 $line_items[] = [
                     'price_data' => [
                         'currency' => 'eur',
-                        'product_data' => ['name' => $item->producto->nombre],
-                        'unit_amount' => $item->producto->precio * 100, // En céntimos
+                        'product_data' => ['name' => "{$item->variante->producto->nombre} - {$item->variante->color->nombre} / {$item->variante->talla->nombre}"],
+                        'unit_amount' => $item->variante->producto->precio * 100,
                     ],
                     'quantity' => $item->cantidad,
                 ];
@@ -136,9 +137,9 @@ class CheckoutController extends Controller
 
             // 2. Recuperamos el ID del pedido que escondimos en el Paso 1
             $orderId = $session->metadata->order_id;
-            $order = Order::with('orderItems.producto')->findOrFail($orderId);
+            // Cargamos la variante para restarle el stock
+            $order = Order::with('orderItems.variante')->findOrFail($orderId);
 
-            // Si el pedido ya estaba pagado 
             if ($order->estado === 'pagado') {
                 return response()->json(['message' => 'Este pedido ya estaba confirmado.', 'order' => $order], 200);
             }
@@ -150,8 +151,7 @@ class CheckoutController extends Controller
 
             // 4. RESTAR EL STOCK REAL DE LA TIENDA
             foreach ($order->orderItems as $item) {
-                // Descontamos del almacén lo que el usuario ha comprado
-                $item->producto->decrement('stock', $item->cantidad);
+                $item->variante->decrement('stock', $item->cantidad);
             }
 
             // 5. VACIAR EL CARRITO DEL USUARIO
