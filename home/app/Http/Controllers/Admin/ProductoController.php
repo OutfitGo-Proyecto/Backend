@@ -19,7 +19,7 @@ class ProductoController extends Controller
 
     public function index()
     {
-        // Traemos los productos ordenados por los más nuevos, de 10 en 10(mas control)
+        // Traemos los productos ordenados por los más nuevos, de 10 en 10
         $productos = Producto::orderBy('id', 'asc')->paginate(10);
 
         // Los productos que estan a punto de acabarse(yo lo veo mejor)
@@ -122,6 +122,10 @@ class ProductoController extends Controller
         // 3. Si el usuario ha subido una imagen nueva lo guardamos
         if ($request->hasFile('imagen')) {
 
+            if ($producto->url_imagen_principal) {
+                Storage::disk('public')->delete($producto->url_imagen_principal);
+            }
+
             $datosActualizar['url_imagen_principal'] = $request->file('imagen')->store('productos', 'public');
         }
 
@@ -144,10 +148,10 @@ class ProductoController extends Controller
 
         // 2. Borramos la imagen física del disco duro
         if ($producto->url_imagen_principal) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($producto->url_imagen_principal);
+            Storage::disk('public')->delete($producto->url_imagen_principal);
         }
 
-        // 3. Limpiamos las tablas intermedias (Tallas y Colores)
+        // 3. Limpiamos las tablas intermedias
         $producto->tallas()->detach();
         $producto->colores()->detach();
 
@@ -172,12 +176,12 @@ class ProductoController extends Controller
 
         // 2. Devolvemos el stock a los productos de la tienda
         foreach ($pedido->orderItems as $item) {
-            $producto = \App\Models\Producto::find($item->producto_id);
+            $producto = Producto::find($item->producto_id);
             if ($producto) {
                 $producto->increment('stock', $item->cantidad);
             }
         }
 
-        return redirect()->back()->with('success', '📦 ¡Paquete recibido, devolución aprobada y stock restaurado!');
+        return redirect()->back()->with('success', ' ¡Paquete recibido, devolución aprobada y stock restaurado!');
     }
 }

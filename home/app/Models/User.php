@@ -27,6 +27,8 @@ class User extends Authenticatable
         'provincia',
         'codigo_postal',
         'telefono',
+        'rol',
+        'is_active',
     ];
 
     /**
@@ -74,5 +76,20 @@ class User extends Authenticatable
     public function favorites()
     {
         return $this->hasMany(Favorite::class);
+    }
+
+    /**
+     * Helper para saber si el usuario es admin
+     */
+    public function isAdmin()
+    {
+        return $this->rol === 'admin_productos' || $this->rol === 'admin_usuarios';
+    }
+
+    // Relación: Un usuario tiene muchos pedidos (Orders)
+    public function pedidos()
+    {
+        // Le decimos a Laravel que use el modelo Order
+        return $this->hasMany(Order::class);
     }
 }
