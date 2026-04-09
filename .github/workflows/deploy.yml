@@ -30,24 +30,23 @@ jobs:
             grep -q "^GOOGLE_REDIRECT_URI=" home/.env && sed -i "s|^GOOGLE_REDIRECT_URI=.*|GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}|" home/.env || echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> home/.env
 
 
-            # 1. Reiniciamos contenedores con la nueva estructura
+            # 1. Bajamos contenedores anteriores
             sudo docker compose down --remove-orphans
+
+            # 2. Instalación de librerías ANTES de levantar el servicio principal
+            # Usamos 'run --rm' para crear un contenedor temporal que instale todo
+            sudo docker compose run --rm app composer install --optimize-autoloader
+
+            # 3. Levantamos el sistema completo
             sudo docker compose up -d --build
             
-            sleep 45
-            
-            # 3. Arreglo de permisos
+            # 4. Arreglo de permisos y Limpieza de caché
             sudo chown -R ubuntu:www-data home/storage home/bootstrap/cache
             sudo chmod -R 775 home/storage home/bootstrap/cache
-
-            # 4. Instalación de librerías dentro del contenedor
-            sudo docker compose exec -T app composer install --optimize-autoloader
-
-            # 5. Configuración de Laravel
             sudo docker compose exec -T app php artisan config:clear
             sudo docker compose exec -T app php artisan key:generate --force
 
-            # 6. Base de datos: Migración
+            # 5. Base de datos: Migración
             sudo docker compose exec -e DB_HOST=laravel_db -T app php artisan migrate --force
             
             # 7. Opcional: Sembrado de datos (Descomentar para poblar la DB automáticamente en cada despliegue)
