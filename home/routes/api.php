@@ -17,6 +17,10 @@ Route::get('/productos/{slug}', [ProductoController::class, 'show']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Autenticación Social (Google)
+Route::get('/auth/google/redirect', [\App\Http\Controllers\Api\SocialAuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [\App\Http\Controllers\Api\SocialAuthController::class, 'handleGoogleCallback']);
+
 
 
 // Rutas Privadas (Requieren Autenticación)
