@@ -40,5 +40,8 @@ jobs:
             sudo docker compose exec -T app php artisan config:clear
             sudo docker compose exec -T app php artisan key:generate --force
 
-            # 6. Base de datos: Migración (Para que no se borre la base de datos cada vea que )
+            # 6. Base de datos: Migración
             sudo docker compose exec -e DB_HOST=laravel_db -T app php artisan migrate --force
+            
+            # 7. Opcional: Sembrado de datos (Descomentar para poblar la DB automáticamente en cada despliegue)
+            # sudo docker compose exec -T app php artisan db:seed --force
