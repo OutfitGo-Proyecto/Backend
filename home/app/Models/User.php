@@ -22,16 +22,27 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'direccion',
-        'ciudad',
-        'provincia',
-        'codigo_postal',
-        'telefono',
         'rol',
         'is_active',
         'google_id',
         'avatar',
     ];
+    
+    /**
+     * Accesor rápido para obtener la dirección principal
+     */
+    public function primaryAddress()
+    {
+        return $this->hasOne(UserAddress::class)->where('es_principal', true);
+    }
+
+    /**
+     * Relación con todas las direcciones del usuario
+     */
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -78,20 +89,5 @@ class User extends Authenticatable
     public function favorites()
     {
         return $this->hasMany(Favorite::class);
-    }
-
-    /**
-     * Helper para saber si el usuario es admin
-     */
-    public function isAdmin()
-    {
-        return $this->rol === 'admin_productos' || $this->rol === 'admin_usuarios';
-    }
-
-    // Relación: Un usuario tiene muchos pedidos (Orders)
-    public function pedidos()
-    {
-        // Le decimos a Laravel que use el modelo Order
-        return $this->hasMany(Order::class);
     }
 }
