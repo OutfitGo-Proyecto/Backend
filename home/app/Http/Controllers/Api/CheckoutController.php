@@ -12,26 +12,20 @@ use Stripe\Checkout\Session;
 
 class CheckoutController extends Controller
 {
-    /**
-     * PASO 1: Crear pedido "Pendiente" y redirigir a Stripe
-     */
     public function iniciarPago(Request $request)
     {
-        // 1. Validar los datos del nuevo formulario (sin tarjeta)
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'apellidos' => 'required|string|max:255',
-            'telefono' => 'required|string|max:20',
-            'direccion' => 'required|string|max:255',
-            'ciudad' => 'required|string|max:255',
-            'provincia' => 'required|string|max:255',
-            'codigo_postal' => 'required|string|max:10',
-            'notas' => 'nullable|string'
+            'address_id' => 'required|integer'
         ]);
 
+        /** @var \App\Models\User $user */
         $user = $request->user();
-        // Cargamos la variante y sus detalles
-        $cartItems = CartItem::with(['variante.producto', 'variante.color', 'variante.talla'])->where('user_id', $user->id)->get();
+        
+        $address = $user->addresses()->findOrFail($request->address_id);
+
+        $cartItems = CartItem::with(['variante.producto', 'variante.color', 'variante.talla'])
+            ->where('user_id', $user->id)
+            ->get();
 
         if ($cartItems->isEmpty()) {
             return response()->json(['message' => 'El carrito está vacío.'], 400);
@@ -39,7 +33,6 @@ class CheckoutController extends Controller
 
         $total = 0;
         
-        // 2. Verificar stock de la variante antes de dejarle ir a pagar
         foreach ($cartItems as $item) {
             if ($item->variante->stock < $item->cantidad) {
                 return response()->json([
@@ -52,31 +45,28 @@ class CheckoutController extends Controller
         try {
             DB::beginTransaction();
 
-            // 3. CREAR EL PEDIDO COMO PENDIENTE 
             $order = Order::create([
-                'user_id' => $user->id,
-                'total' => $total,
-                'estado' => 'pendiente',
-                'nombre' => $request->nombre,
-                'apellidos' => $request->apellidos,
-                'telefono' => $request->telefono,
-                'direccion' => $request->direccion,
-                'ciudad' => $request->ciudad,
-                'provincia' => $request->provincia,
-                'codigo_postal' => $request->codigo_postal,
-                'notas' => $request->notas,
+                'user_id'       => $user->id,
+                'total'         => $total,
+                'estado'        => 'pendiente',
+                'nombre'        => $user->name,
+                'apellidos'     => '',
+                'telefono'      => $address->telefono,
+                'direccion'     => $address->direccion,
+                'ciudad'        => $address->ciudad,
+                'provincia'     => $address->provincia,
+                'codigo_postal' => $address->codigo_postal,
+                'notas'         => $request->notas ?? '',
             ]);
 
-            // GUARDAMOS LA VARIANTE
             foreach ($cartItems as $item) {
                 $order->orderItems()->create([
                     'producto_variante_id' => $item->producto_variante_id,
-                    'cantidad' => $item->cantidad,
-                    'precio_unitario' => $item->variante->producto->precio,
+                    'cantidad'             => $item->cantidad,
+                    'precio_unitario'      => $item->variante->producto->precio,
                 ]);
             }
 
-            // 4. Configurar Stripe
             Stripe::setApiKey(config('services.stripe.secret'));
 
             $line_items = [];
@@ -84,30 +74,28 @@ class CheckoutController extends Controller
                 $line_items[] = [
                     'price_data' => [
                         'currency' => 'eur',
-                        'product_data' => ['name' => "{$item->variante->producto->nombre} - {$item->variante->color->nombre} / {$item->variante->talla->nombre}"],
+                        'product_data' => [
+                            'name' => "{$item->variante->producto->nombre} - {$item->variante->color->nombre} / {$item->variante->talla->nombre}"
+                        ],
                         'unit_amount' => $item->variante->producto->precio * 100,
                     ],
                     'quantity' => $item->cantidad,
                 ];
             }
 
-            // 5. Crear sesión de pago en Stripe
             $checkout_session = Session::create([
                 'payment_method_types' => ['card'],
-                'line_items' => $line_items,
-                'mode' => 'payment',
-                //Le pasamos el ID del pedido a Stripe en los metadatos de forma oculta
-                'metadata' => [
+                'line_items'           => $line_items,
+                'mode'                 => 'payment',
+                'metadata'             => [
                     'order_id' => $order->id 
                 ],
-                // Ajusta estas URLs a tu frontend. Le pasamos el session_id en la URL de éxito
-                'success_url' => 'https://outfitgo.duckdns.org/pago-exitoso?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => 'https://outfitgo.duckdns.org/carrito',
+                'success_url'          => env('FRONTEND_URL', 'http://localhost:4200') . '/checkout/success?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url'           => env('FRONTEND_URL', 'http://localhost:4200') . '/cart',
             ]);
 
             DB::commit();
 
-            // Devolvemos la URL a Angular para que mande al usuario allí
             return response()->json(['url' => $checkout_session->url], 200);
 
         } catch (\Exception $e) {
@@ -116,18 +104,13 @@ class CheckoutController extends Controller
         }
     }
 
-    /**
-     * PASO 2: Confirmar la compra 
-     */
     public function confirmarPago(Request $request)
     {
-        // Angular manda el session_id que le dio Stripe en la URL
         $request->validate([
             'session_id' => 'required|string',
         ]);
 
         try {
-            // 1. Verificación a Stripe
             Stripe::setApiKey(config('services.stripe.secret'));
             $session = Session::retrieve($request->session_id);
 
@@ -135,9 +118,7 @@ class CheckoutController extends Controller
                 return response()->json(['message' => 'El pago no se ha completado.'], 400);
             }
 
-            // 2. Recuperamos el ID del pedido que escondimos en el Paso 1
             $orderId = $session->metadata->order_id;
-            // Cargamos la variante para restarle el stock
             $order = Order::with('orderItems.variante')->findOrFail($orderId);
 
             if ($order->estado === 'pagado') {
@@ -146,15 +127,12 @@ class CheckoutController extends Controller
 
             DB::beginTransaction();
 
-            // 3. ACTUALIZAR A PAGADO
             $order->update(['estado' => 'pagado']);
 
-            // 4. RESTAR EL STOCK REAL DE LA TIENDA
             foreach ($order->orderItems as $item) {
                 $item->variante->decrement('stock', $item->cantidad);
             }
 
-            // 5. VACIAR EL CARRITO DEL USUARIO
             CartItem::where('user_id', $order->user_id)->delete();
 
             DB::commit();

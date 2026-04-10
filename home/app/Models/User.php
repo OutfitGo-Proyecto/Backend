@@ -21,13 +21,16 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
-        'direccion',
-        'ciudad',
-        'provincia',
-        'codigo_postal',
-        'telefono',
+        'password'
     ];
+    
+    /**
+     * Accesor rápido para obtener la dirección principal
+     */
+    public function primaryAddress()
+    {
+        return $this->hasOne(UserAddress::class)->where('es_principal', true);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -74,5 +77,13 @@ class User extends Authenticatable
     public function favorites()
     {
         return $this->hasMany(Favorite::class);
+    }
+
+    /**
+     * Relación: Un usuario tiene muchas direcciones
+     */
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class);
     }
 }
