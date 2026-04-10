@@ -21,7 +21,11 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password'
+        'password',
+        'rol',
+        'is_active',
+        'google_id',
+        'avatar',
     ];
     
     /**
@@ -77,13 +81,5 @@ class User extends Authenticatable
     public function favorites()
     {
         return $this->hasMany(Favorite::class);
-    }
-
-    /**
-     * Relación: Un usuario tiene muchas direcciones
-     */
-    public function addresses()
-    {
-        return $this->hasMany(UserAddress::class);
     }
 }

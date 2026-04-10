@@ -51,6 +51,13 @@ class AuthController extends Controller
             ]);
         }
 
+        // Si la cuenta del usuario esta suspendida no puede entrar.
+        if ($user && !$user->is_active) {
+            throw ValidationException::withMessages([
+                'email' => ['Tu cuenta ha sido suspendida. Contacta con el administrador.'],
+            ]);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([

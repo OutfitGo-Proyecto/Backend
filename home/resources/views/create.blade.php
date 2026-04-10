@@ -15,7 +15,7 @@
             <a href="/admin/productos" class="text-gray-500 hover:underline">Volver a la lista</a>
         </div>
 
-        <form action="{{ route('productos.store') }}" method="POST" class="space-y-4" enctype="multipart/form-data">
+        <form action="{{ route('admin.productos.store') }}" method="POST" class="space-y-4" enctype="multipart/form-data">
             @csrf
 
             <div>

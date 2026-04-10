@@ -15,7 +15,7 @@
             <a href="/admin/productos" class="text-gray-500 hover:underline">Cancelar y volver</a>
         </div>
 
-        <form action="{{ route('productos.update', $producto->id) }}" method="POST" class="space-y-4" enctype="multipart/form-data">
+        <form action="{{ route('admin.productos.update', $producto->id) }}" method="POST" class="space-y-4" enctype="multipart/form-data">
             
             @csrf
             @method('PUT')

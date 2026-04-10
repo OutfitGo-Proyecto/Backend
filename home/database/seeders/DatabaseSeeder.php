@@ -15,11 +15,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Crear usuario administrador
+        // 1. Crear usuario administrador General
         User::factory()->create([
-            'name' => 'Admin OutfitGo',
+            'name' => 'Admin General',
             'email' => 'admin@outfitgo.com',
             'password' => bcrypt('password'),
+            'rol' => 'admin',
         ]);
 
         //Creo Usuario Administrador de productos
@@ -27,8 +28,24 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin Productos',
             'email' => 'adminProductos@gmail.com',
             'password' => bcrypt('productos123'),
+            'rol' => 'admin_productos',
         ]);
-        
+
+        // Creo Usuario Administrador de Usuarios
+        User::factory()->create([
+            'name' => 'Admin Usuarios',
+            'email' => 'adminUsuarios@gmail.com',
+            'password' => bcrypt('usuarios123'),
+            'rol' => 'admin_usuarios',
+        ]);
+
+        // Creo Usuario Cliente
+        User::factory()->create([
+            'name' => 'Usuario Cliente',
+            'email' => 'cliente@gmail.com',
+            'password' => bcrypt('cliente123'),
+            'rol' => 'cliente',
+        ]);
 
         // 2. Crear Categorías Reales
         $categorias = [

@@ -15,7 +15,7 @@
             
 
             
-            <a href="{{ route('productos.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-bold">
+            <a href="{{ route('admin.productos.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 font-bold">
                 + Nuevo Producto
             </a>            
             
@@ -25,9 +25,22 @@
                 </a>
             </div>
         </div>
+        
+        <style>
+            @keyframes desaparecer {
+                0%   { opacity: 1; max-height: 200px; }
+                70%  { opacity: 1; max-height: 200px; } 
+                90%  { opacity: 0; max-height: 200px; padding: 0.75rem 1rem; margin-bottom: 1rem; border-width: 1px; } 
+                100% { opacity: 0; max-height: 0; padding: 0; margin-bottom: 0; border-width: 0; overflow: hidden; } 
+            }
+            .alerta-temporal {
+                animation: desaparecer 4s forwards; 
+                overflow: hidden; 
+            }
+        </style>
 
         @if (session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4 alerta-temporal">
                 {{ session('success') }}
             </div>
         @endif
@@ -73,9 +86,9 @@
                         </td>
                         
                         <td class="p-3 border-b text-center space-x-2">
-                            <a href="{{ route('productos.edit', $producto->id) }}" class="text-yellow-600 hover:text-yellow-800 font-bold">Editar</a>
+                            <a href="{{ route('admin.productos.edit', $producto->id) }}" class="text-yellow-600 hover:text-yellow-800 font-bold">Editar</a>
                             
-                            <form action="{{ route('productos.destroy', $producto->id) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Seguro que quieres borrar este producto?');">
+                            <form action="{{ route('admin.productos.destroy', $producto->id) }}" method="POST" class="inline-block" onsubmit="return confirm('¿Seguro que quieres borrar este producto?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-red-600 hover:text-red-800 font-bold">Borrar</button>
