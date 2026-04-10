@@ -37,6 +37,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Relación con todas las direcciones del usuario
+     */
+    public function addresses()
+    {
+        return $this->hasMany(UserAddress::class);
+    }
+
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var list<string>

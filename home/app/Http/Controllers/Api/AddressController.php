@@ -87,7 +87,7 @@ class AddressController extends Controller
         return DB::transaction(function () use ($user, $address, $validated) {
             // Si el usuario intenta poner esta como principal, quitamos el check a las demás
             if (isset($validated['es_principal']) && $validated['es_principal']) {
-                $user()->addresses()->where('id', '!=', $address->id)->update(['es_principal' => false]);
+                $user->addresses()->where('id', '!=', $address->id)->update(['es_principal' => false]);
             }
 
             $address->update($validated);
