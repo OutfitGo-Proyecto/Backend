@@ -80,4 +80,40 @@ class AuthController extends Controller
             'message' => 'Cierre de sesión exitoso',
         ]);
     }
+
+    /**
+     * Actualizar perfil del usuario autenticado.
+     */
+    public function updateProfile(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = $request->user();
+
+        // Validamos los datos
+        $validated = $request->validate([
+            'name'          => 'sometimes|string|max:255',
+            'email'         => 'sometimes|string|email|max:255|unique:users,email,' . $user->id,
+            'password'      => 'nullable|string|min:8', // Opcional, por si quiere cambiarla
+            'direccion'     => 'nullable|string|max:255',
+            'ciudad'        => 'nullable|string|max:100',
+            'provincia'     => 'nullable|string|max:100',
+            'codigo_postal' => 'nullable|string|max:10',
+            'telefono'      => 'nullable|string|max:20',
+        ]);
+
+        // Si el usuario escribió una contraseña nueva, la encriptamos. Si la dejó vacía, la quitamos para no sobreescribirla con nada.
+        if (!empty($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
+        } else {
+            unset($validated['password']);
+        }
+
+        // Actualizamos la base de datos
+        $user->update($validated);
+
+        return response()->json([
+            'message' => 'Perfil actualizado exitosamente',
+            'user'    => $user
+        ]);
+    }
 }
