@@ -26,6 +26,7 @@ class AuthController extends Controller
             'codigo_postal' => $request->codigo_postal,
             'provincia' => $request->provincia,
             'telefono' => $request->telefono,   
+            'is_active' => true,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
