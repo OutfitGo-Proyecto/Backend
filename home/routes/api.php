@@ -72,4 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Direcciones
     Route::get('/addresses', [AddressController::class, 'index']);
     Route::post('/addresses', [AddressController::class, 'store']);
+    Route::put('/addresses/{id}', [AddressController::class, 'update']);
+    Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
+    Route::patch('/addresses/{id}/set-primary', [AddressController::class, 'setPrimary']);
 });
