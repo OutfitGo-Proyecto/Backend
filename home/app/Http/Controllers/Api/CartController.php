@@ -84,15 +84,15 @@ class CartController extends Controller
             'cantidad' => ['required', 'integer', 'min:1'],
         ]);
 
-        $cartItem = CartItem::where('user_id', $request->user()->id)
+        $cartItem = CartItem::with('variante')->where('user_id', $request->user()->id)
             ->where('id', $id)
             ->firstOrFail();
 
-        $producto = $cartItem->producto;
+        $stockDisponible = $cartItem->variante ? $cartItem->variante->stock : ($cartItem->producto->stock ?? 0);
 
-        if ($producto->stock < $request->cantidad) {
+        if ($stockDisponible < $request->cantidad) {
             return response()->json([
-                'message' => 'No hay suficiente stock disponible.',
+                'message' => 'No hay suficiente stock disponible para esta variante.',
             ], 422);
         }
 

@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use App\Mail\ConfirmacionCompra;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
@@ -34,12 +36,17 @@ class CheckoutController extends Controller
         $total = 0;
         
         foreach ($cartItems as $item) {
-            if ($item->variante->stock < $item->cantidad) {
+            $variante = $item->variante;
+            if (!$variante) {
+                return response()->json(['message' => 'Error: El producto ya no tiene variantes disponibles.'], 422);
+            }
+
+            if ($variante->stock < $item->cantidad) {
                 return response()->json([
-                    'message' => "Stock insuficiente para: {$item->variante->producto->nombre} (Talla: {$item->variante->talla->nombre})"
+                    'message' => "Stock insuficiente para: {$variante->producto->nombre} (Talla: {$variante->talla->nombre})"
                 ], 422);
             }
-            $total += $item->variante->producto->precio * $item->cantidad;
+            $total += $variante->producto->precio * $item->cantidad;
         }
 
         try {
@@ -50,7 +57,7 @@ class CheckoutController extends Controller
                 'total'         => $total,
                 'estado'        => 'pendiente',
                 'nombre'        => $user->name,
-                'apellidos'     => '',
+                'apellidos'     => '', 
                 'telefono'      => $address->telefono,
                 'direccion'     => $address->direccion,
                 'ciudad'        => $address->ciudad,
@@ -61,6 +68,7 @@ class CheckoutController extends Controller
 
             foreach ($cartItems as $item) {
                 $order->orderItems()->create([
+                    'producto_id'          => $item->variante->producto_id,
                     'producto_variante_id' => $item->producto_variante_id,
                     'cantidad'             => $item->cantidad,
                     'precio_unitario'      => $item->variante->producto->precio,
@@ -71,17 +79,21 @@ class CheckoutController extends Controller
 
             $line_items = [];
             foreach ($cartItems as $item) {
+                $unit_amount = (int) round($item->variante->producto->precio * 100);
+
                 $line_items[] = [
                     'price_data' => [
                         'currency' => 'eur',
                         'product_data' => [
                             'name' => "{$item->variante->producto->nombre} - {$item->variante->color->nombre} / {$item->variante->talla->nombre}"
                         ],
-                        'unit_amount' => $item->variante->producto->precio * 100,
+                        'unit_amount' => $unit_amount,
                     ],
                     'quantity' => $item->cantidad,
                 ];
             }
+
+            $frontend_url = env('FRONTEND_URL', 'https://outfitgo.duckdns.org');
 
             $checkout_session = Session::create([
                 'payment_method_types' => ['card'],
@@ -90,8 +102,8 @@ class CheckoutController extends Controller
                 'metadata'             => [
                     'order_id' => $order->id 
                 ],
-                'success_url'          => env('FRONTEND_URL', 'http://localhost:4200') . '/checkout/success?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url'           => env('FRONTEND_URL', 'http://localhost:4200') . '/cart',
+                'success_url'          => rtrim($frontend_url, '/') . '/checkout/success?session_id={CHECKOUT_SESSION_ID}',
+                'cancel_url'           => rtrim($frontend_url, '/') . '/cart',
             ]);
 
             DB::commit();
@@ -118,14 +130,38 @@ class CheckoutController extends Controller
                 return response()->json(['message' => 'El pago no se ha completado.'], 400);
             }
 
-            $orderId = $session->metadata->order_id;
-            $order = Order::with('orderItems.variante')->findOrFail($orderId);
+            $orderId = $session->metadata->order_id ?? null;
+            if (!$orderId) {
+                return response()->json(['message' => 'La sesión de Stripe no contiene un pedido válido.'], 422);
+            }
+
+            $order = Order::with(['user', 'orderItems.variante'])->findOrFail($orderId);
+
+            if ((int) $order->user_id !== (int) $request->user()->id) {
+                return response()->json(['message' => 'No autorizado para confirmar este pedido.'], 403);
+            }
 
             if ($order->estado === 'pagado') {
                 return response()->json(['message' => 'Este pedido ya estaba confirmado.', 'order' => $order], 200);
             }
 
             DB::beginTransaction();
+
+            foreach ($order->orderItems as $item) {
+                if (!$item->variante) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'No se puede confirmar el pedido: una variante ya no existe.'
+                    ], 422);
+                }
+
+                if ($item->variante->stock < $item->cantidad) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'No se puede confirmar el pedido: stock insuficiente en una variante.'
+                    ], 422);
+                }
+            }
 
             $order->update(['estado' => 'pagado']);
 
@@ -137,13 +173,17 @@ class CheckoutController extends Controller
 
             DB::commit();
 
+            Mail::to($order->user->email)->send(new ConfirmacionCompra($order));
+
             return response()->json([
                 'message' => '¡Pago verificado y compra completada con éxito!',
                 'order' => $order
             ], 200);
 
         } catch (\Exception $e) {
-            DB::rollBack();
+            if (DB::transactionLevel() > 0) {
+                DB::rollBack();
+            }
             return response()->json(['message' => 'Error al verificar el pago: ' . $e->getMessage()], 500);
         }
     }
