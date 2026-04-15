@@ -9,12 +9,14 @@ use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\Api\PedidoController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\ResenaPaginaController;
 
 
 
 // Rutas Públicas de Productos
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::get('/productos/{slug}', [ProductoController::class, 'show']);
+Route::get('/resenas-pagina', [ResenaPaginaController::class, 'index']);
 
 // Rutas Públicas de Autenticación
 Route::post('/register', [AuthController::class, 'register']);
