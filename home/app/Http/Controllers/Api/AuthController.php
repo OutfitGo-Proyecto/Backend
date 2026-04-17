@@ -134,17 +134,17 @@ class AuthController extends Controller
         $user = User::findOrFail($id);
 
         if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-            return redirect()->away(env('APP_URL') . '/login?verified=false');
+            return redirect()->away(config('app.url') . '/login?verified=false');
         }
 
         if ($user->hasVerifiedEmail()) {
-            return redirect()->away(env('APP_URL') . '/login?verified=true');
+            return redirect()->away(config('app.url') . '/login?verified=true');
         }
 
         if ($user->markEmailAsVerified()) {
             event(new Verified($user));
         }
 
-        return redirect()->away(env('APP_URL') . '/login?verified=true');
+        return redirect()->away(config('app.url') . '/login?verified=true');
     }
 }
