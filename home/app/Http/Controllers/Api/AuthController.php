@@ -9,6 +9,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Auth\Events\Verified;
 
 class AuthController extends Controller
 {
@@ -29,13 +31,12 @@ class AuthController extends Controller
             'is_active' => true,
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Disparar el evento de registro (esto envía el correo de verificación si MustVerifyEmail está implementado)
+        event(new Registered($user));
 
         return response()->json([
-            'message' => 'Usuario registrado exitosamente',
+            'message' => 'Usuario registrado exitosamente. Por favor, revisa tu correo para verificar tu cuenta.',
             'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'Bearer',
         ], 201);
     }
 
@@ -56,6 +57,13 @@ class AuthController extends Controller
         if ($user && !$user->is_active) {
             throw ValidationException::withMessages([
                 'email' => ['Tu cuenta ha sido suspendida. Contacta con el administrador.'],
+            ]);
+        }
+
+        // Si el correo no ha sido verificado no puede entrar.
+        if ($user && !$user->hasVerifiedEmail()) {
+            throw ValidationException::withMessages([
+                'email' => ['Su correo no está verificado. Por favor, revisa tu bandeja de entrada.'],
             ]);
         }
 
@@ -116,5 +124,27 @@ class AuthController extends Controller
             'message' => 'Perfil actualizado exitosamente',
             'user'    => $user
         ]);
+    }
+
+    /**
+     * Verificar el correo electrónico.
+     */
+    public function verify(Request $request, $id, $hash)
+    {
+        $user = User::findOrFail($id);
+
+        if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+            return redirect()->away(env('APP_URL') . '/login?verified=false');
+        }
+
+        if ($user->hasVerifiedEmail()) {
+            return redirect()->away(env('APP_URL') . '/login?verified=true');
+        }
+
+        if ($user->markEmailAsVerified()) {
+            event(new Verified($user));
+        }
+
+        return redirect()->away(env('APP_URL') . '/login?verified=true');
     }
 }

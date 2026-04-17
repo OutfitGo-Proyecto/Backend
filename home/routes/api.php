@@ -21,6 +21,8 @@ Route::get('/resenas-pagina', [ResenaPaginaController::class, 'index']);
 // Rutas Públicas de Autenticación
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
+    ->name('verification.verify');
 
 // Autenticación Social (Google)
 Route::get('/auth/google/redirect', [\App\Http\Controllers\Api\SocialAuthController::class, 'redirectToGoogle']);
