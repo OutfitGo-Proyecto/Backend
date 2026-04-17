@@ -68,6 +68,8 @@ class Producto extends Model
         return $this->hasMany(ProductoVariante::class);
     }
 
+    protected $appends = ['nombre_localizado', 'descripcion_localizada'];
+
     /**
      * Obtiene el nombre del producto según el idioma actual (o español por defecto).
      */

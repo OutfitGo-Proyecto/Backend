@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->append(\App\Http\Middleware\SetLanguage::class);
         $middleware->alias([
             'admin' => AdminAuth::class,
             'verificar.rol' => VerificarRol::class,
