@@ -68,9 +68,49 @@ class Producto extends Model
         return $this->hasMany(ProductoVariante::class);
     }
 
+    /**
+     * Obtiene el nombre del producto según el idioma actual (o español por defecto).
+     */
+    public function getNombreLocalizadoAttribute()
+    {
+        $locale = app()->getLocale();
+        $column = 'nombre_' . $locale;
+        
+        if ($locale !== 'es' && !empty($this->{$column})) {
+            return $this->{$column};
+        }
+        
+        return $this->nombre;
+    }
+
+    /**
+     * Obtiene la descripción del producto según el idioma actual.
+     */
+    public function getDescripcionLocalizadaAttribute()
+    {
+        $locale = app()->getLocale();
+        $column = 'descripcion_' . $locale;
+        
+        if ($locale !== 'es' && !empty($this->{$column})) {
+            return $this->{$column};
+        }
+        
+        return $this->descripcion;
+    }
+
     protected $fillable = [
-    'nombre', 'slug', 'descripcion', 'publico', 
-    'url_imagen_principal', 'precio', 'stock', 
-    'marca_id', 'categoria_id'
-];
+        'nombre', 
+        'nombre_en', 
+        'nombre_fr', 
+        'slug', 
+        'descripcion', 
+        'descripcion_en', 
+        'descripcion_fr', 
+        'publico', 
+        'url_imagen_principal', 
+        'precio', 
+        'stock', 
+        'marca_id', 
+        'categoria_id'
+    ];
 }
