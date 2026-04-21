@@ -33,7 +33,7 @@ class ResenaPaginaController extends Controller
         
         $resena->visible_en_portada = false; 
 
-        $resena->user_id = 1; 
+        $resena->user_id = $request->user()->id; 
 
         $resena->save();
 
