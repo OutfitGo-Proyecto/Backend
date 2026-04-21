@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\Api\PedidoController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\ResenaPaginaController;
+use \App\Http\Controllers\Api\SocialAuthController;
 
 
 
@@ -25,8 +26,8 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
     ->name('verification.verify');
 
 // Autenticación Social (Google)
-Route::get('/auth/google/redirect', [\App\Http\Controllers\Api\SocialAuthController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [\App\Http\Controllers\Api\SocialAuthController::class, 'handleGoogleCallback']);
+Route::get('/auth/google/redirect', [SocialAuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
 
 
@@ -79,4 +80,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/addresses/{id}', [AddressController::class, 'update']);
     Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
     Route::patch('/addresses/{id}/set-primary', [AddressController::class, 'setPrimary']);
+
+    Route::get('/productos/{id}/historial', [ProductoController::class, 'historialPrecios']);
+
+    Route::post('/resenas-pagina', [ResenaPaginaController::class, 'store']);
+    Route::get('/resenas-pagina', [ResenaPaginaController::class, 'index']);
 });

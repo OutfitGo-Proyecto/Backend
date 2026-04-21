@@ -115,4 +115,9 @@ class Producto extends Model
         'marca_id', 
         'categoria_id'
     ];
+
+    public function historialPrecios()
+    {
+        return $this->hasMany(HistorialPrecio::class);
+    }
 }

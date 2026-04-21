@@ -3,11 +3,14 @@
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\Admin\ProductoController as AdminProductoController;
 use App\Http\Controllers\AdminUsuarioController;
+use App\Http\Controllers\AdminOutfitWizardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 
 Route::get('/', [ProductoController::class, 'index'])->name('home');
 
+// Ruta pública para la IA
+Route::post('/outfit-wizard', [OutfitWizardController::class, 'generate']);
 // Ruta alternativa si quieres una url tipo /catalogo
 Route::get('/catalogo', [ProductoController::class, 'index'])->name('productos.index');
 
@@ -25,6 +28,7 @@ Route::prefix('admin')->middleware(['admin'])->group(function () {
     
     // Rutas de Productos
     Route::resource('productos', AdminProductoController::class)->names('admin.productos');
+    //Route::post('/outfit-wizard', [AdminOutfitWizardController::class, 'generate'])->name('admin.outfit-wizard');
     Route::put('/pedidos/{id}/aprobar-devolucion', [AdminProductoController::class, 'aprobarDevolucion'])
     ->name('admin.pedidos.aprobar-devolucion');
 
