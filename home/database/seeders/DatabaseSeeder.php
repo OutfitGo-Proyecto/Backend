@@ -237,99 +237,71 @@ class DatabaseSeeder extends Seeder
             ]
         ];
 
-        // 7. Insertar los productos y SUS VARIANTES
+// 7. Insertar los productos y SUS VARIANTES
         foreach ($productosReales as $pData) {
-            $producto = Producto::create([
-                'nombre' => $pData['nombre'],
-                'slug' => $makeSlug($pData['nombre']),
-                'descripcion' => $pData['descripcion'],
-                'publico' => $pData['publico'],
-                'url_imagen_principal' => $pData['url_imagen_principal'],
-                'precio' => $pData['precio'],
-                'stock' => $pData['stock'], // Lo mantenemos como informativo
-                'marca_id' => $pData['marca'],
-                'categoria_id' => $pData['categoria'],
-            ]);
+            $producto = Producto::updateOrCreate(
+                ['slug' => $makeSlug($pData['nombre'])], // Busca por slug
+                [
+                    'nombre' => $pData['nombre'],
+                    'descripcion' => $pData['descripcion'],
+                    'publico' => $pData['publico'],
+                    'url_imagen_principal' => $pData['url_imagen_principal'],
+                    'precio' => $pData['precio'],
+                    'stock' => $pData['stock'],
+                    'marca_id' => $pData['marca'],
+                    'categoria_id' => $pData['categoria'],
+                ]
+            );
 
             // Sincronizar relaciones pivote
             $producto->tallas()->sync($pData['tallas']);
             $producto->colores()->sync($pData['colores']);
 
-            // 🌟 AÑADIDO: CREAR LAS VARIANTES DE STOCK
-            // 🌟 CREAR LAS VARIANTES CON STOCK MUY VARIADO PARA PRUEBAS
+            // 🌟 CREAR LAS VARIANTES (Evitando duplicados con updateOrCreate)
             foreach ($pData['tallas'] as $tallaId) {
                 foreach ($pData['colores'] as $colorId) {
-                    
-                    // Truco matemático: 1 de cada 4 variantes tendrá stock 0 (Agotado), 
-                    // el resto tendrá un número aleatorio muy dispar entre 1 y 150.
                     $stockDemo = (rand(1, 4) === 1) ? 0 : rand(1, 150);
 
-                    ProductoVariante::create([
-                        'producto_id' => $producto->id,
-                        'talla_id' => $tallaId,
-                        'color_id' => $colorId,
-                        'stock' => $stockDemo
-                    ]);
+                    ProductoVariante::updateOrCreate(
+                        [
+                            'producto_id' => $producto->id,
+                            'talla_id' => $tallaId,
+                            'color_id' => $colorId,
+                        ],
+                        [
+                            'stock' => $stockDemo
+                        ]
+                    );
                 }
             }
             
-            // Generar 3 imágenes secundarias
-            for ($i = 1; $i <= 3; $i++) {
-                $producto->imagenes()->create([
-                    'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . '/800/800'
-                ]);
+            // Generar 3 imágenes secundarias (SOLO si no tiene ya imágenes creadas)
+            if ($producto->imagenes()->count() === 0) {
+                for ($i = 1; $i <= 3; $i++) {
+                    $producto->imagenes()->create([
+                        'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . '/800/800'
+                    ]);
+                }
             }
         }
-
-        $clonesData = [
-            [
-                'base' => $productosReales[0], 
-                'nombre' => 'Zapatillas Nike Air Force 1 Clásicas Negras', 
-                'descripcion' => 'Desata absolutamente todo tu enorme potencial callejero vistiendo las legendarias e icónicas zapatillas Nike Air Force 1. Un diseño poderoso, agresivo y sumamente limpio enteramente tintado en un muy elegante y sobrio negro mate capaz de resistirse ferozmente a la abrumadora suciedad urbana. Confeccionadas partiendo de un resistente e inmaculado cuero premium liso, mantienen perfectamente oculta la sensacional tecnología especial Nike Air debajo del enorme grosor protector que nos aporta la gran suela de goma.',
-                'colores' => [$colores['Negro']->id]
-            ],
-            [
-                'base' => $productosReales[1], 
-                'nombre' => 'Sudadera con Capucha Adidas Infantil', 
-                'descripcion' => 'Mantén enormemente abrigados y repletos de comodidades modernas a tus pequeñines preferidos durante el gélido invierno confiando plenamente en esta pequeña gran iteración de nuestra fantástica sudadera más famosa y aplaudida. Una pieza innegociable nacida desde Adidas Originals luciendo el llamativo e inmenso trébol mítico frontal. Construida priorizando siempre emplear los algodones naturales completamente amigables con el medio. Su gigantesco bolsillo de estilo canguro mantendrá escondidos esos juguetes.',
-                'publico' => 'infantil',
-                'tallas' => [$tallasObjects['Infantil']['8Y']->id, $tallasObjects['Infantil']['10Y']->id, $tallasObjects['Infantil']['12Y']->id]
-            ],
-            [
-                'base' => $productosReales[3],
-                'nombre' => 'Camiseta Zara Kids Estampado Espacial',
-                'descripcion' => 'Prepara las maletas e invita urgentemente a tu maravilloso hijo o fantástica hija a surcar de forma emocionante toda y cada una de las grandes estrellas del firmamento cósmico gracias a la deslumbrante magia inherente a esta interesantísima camiseta manga corta de Zara Kids. Su colorido y llamativo estampado espacial reluce repletito de hermosísimos planetas volanderos y rápidos cohetes. Fue minuciosamente elaborada escogiendo únicamente el mejor y más dócil poliéster fresco diseñado para correr y sudar.',
-                'colores' => [$colores['Azul Marino']->id, $colores['Gris']->id]
-            ],
-            [
-                'base' => $productosReales[4],
-                'nombre' => 'Zapatillas Puma Running Softride',
-                'descripcion' => 'Eleva enormemente la mismísima calidad de todas y cada una de tus maratones recurrentes utilizando la excelsa tecnología insertada cuidadosamente dentro de estas espectaculares zapatillas neutras provistas por la firma internacional Puma y bautizadas como Softride. Integran asombrosamente una capa inferior inmensa rellena enteramente de una espuma plástica súper reactiva patentada de altísimo confort y rendimiento superior para no tener ninguna fatiga plantar. Destacan notablemente por su peso.',
-                'colores' => [$colores['Blanco']->id, $colores['Rosa']->id]
-            ],
-            [
-                'base' => $productosReales[8],
-                'nombre' => 'Zapatillas Deportivas New Balance 990',
-                'descripcion' => 'Asombra drásticamente al gigantesco mundo exterior presumiendo con soberbia de lucir libremente el estandarte que representa con abrumadora contundencia el linaje americano, esto es sin duda alguna calzar alegremente las New Balance modelo número 990 clásico indiscutible. Zapatillas míticas provistas orgullosamente de las líneas estéticas más atemporales disponibles hoy por hoy en el competitivo mercado actual del running. Destapan grandes y múltiples inserciones generosas compuestas con rica gamuza de cerdo.',
-                'publico' => 'mujer',
-                'colores' => [$colores['Azul Marino']->id, $colores['Beige']->id]
-            ]
-        ];
 
         // 8. Insertar los clones y SUS VARIANTES
         foreach ($clonesData as $clone) {
             $base = $clone['base'];
-            $producto = Producto::create([
-                'nombre' => $clone['nombre'],
-                'slug' => $makeSlug($clone['nombre']),
-                'descripcion' => $clone['descripcion'],
-                'publico' => isset($clone['publico']) ? $clone['publico'] : $base['publico'],
-                'url_imagen_principal' => $base['url_imagen_principal'],
-                'precio' => $base['precio'],
-                'stock' => $base['stock'],
-                'marca_id' => $base['marca'],
-                'categoria_id' => $base['categoria'],
-            ]);
+            
+            $producto = Producto::updateOrCreate(
+                ['slug' => $makeSlug($clone['nombre'])],
+                [
+                    'nombre' => $clone['nombre'],
+                    'descripcion' => $clone['descripcion'],
+                    'publico' => isset($clone['publico']) ? $clone['publico'] : $base['publico'],
+                    'url_imagen_principal' => $base['url_imagen_principal'],
+                    'precio' => $base['precio'],
+                    'stock' => $base['stock'],
+                    'marca_id' => $base['marca'],
+                    'categoria_id' => $base['categoria'],
+                ]
+            );
 
             $tallasAUsar = isset($clone['tallas']) ? $clone['tallas'] : $base['tallas'];
             $coloresAUsar = isset($clone['colores']) ? $clone['colores'] : $base['colores'];
@@ -338,22 +310,29 @@ class DatabaseSeeder extends Seeder
             $producto->tallas()->sync($tallasAUsar);
             $producto->colores()->sync($coloresAUsar);
 
-            // 🌟 AÑADIDO: CREAR LAS VARIANTES DE STOCK PARA LOS CLONES
+            // 🌟 CREAR LAS VARIANTES DE STOCK PARA LOS CLONES
             foreach ($tallasAUsar as $tallaId) {
                 foreach ($coloresAUsar as $colorId) {
-                    ProductoVariante::create([
-                        'producto_id' => $producto->id,
-                        'talla_id' => $tallaId,
-                        'color_id' => $colorId,
-                        'stock' => rand(5, 25)
-                    ]);
+                    ProductoVariante::updateOrCreate(
+                        [
+                            'producto_id' => $producto->id,
+                            'talla_id' => $tallaId,
+                            'color_id' => $colorId,
+                        ],
+                        [
+                            'stock' => rand(5, 25)
+                        ]
+                    );
                 }
             }
 
-            for ($i = 1; $i <= 3; $i++) {
-                $producto->imagenes()->create([
-                    'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . 'clone/800/800'
-                ]);
+            // Generar imágenes clones (SOLO si no tiene ya)
+            if ($producto->imagenes()->count() === 0) {
+                for ($i = 1; $i <= 3; $i++) {
+                    $producto->imagenes()->create([
+                        'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . 'clone/800/800'
+                    ]);
+                }
             }
         }
 
