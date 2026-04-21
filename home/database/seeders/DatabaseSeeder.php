@@ -373,5 +373,8 @@ class DatabaseSeeder extends Seeder
         }
 
         echo "✅ Base de datos poblada con éxito con catálogos hiper-realistas y SKUs de Variantes generados.\n";
+        $this->call([
+            OutfitTestSeeder::class
+        ]);
     }
 }
