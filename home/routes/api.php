@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\PedidoController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\ResenaPaginaController;
 use \App\Http\Controllers\Api\SocialAuthController;
+use App\Http\Controllers\Api\AdminOutfitWizardController;
 
 
 
@@ -85,4 +86,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/resenas-pagina', [ResenaPaginaController::class, 'store']);
     Route::get('/resenas-pagina', [ResenaPaginaController::class, 'index']);
+    Route::post('/outfit-wizard', [AdminOutfitWizardController::class, 'generate']);
+
 });
