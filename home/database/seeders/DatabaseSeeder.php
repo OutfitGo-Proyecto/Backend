@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Marca;
 use App\Models\Categoria;
 use App\Models\Producto;
@@ -20,7 +21,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@outfitgo.com'], 
             [                                 
                 'name' => 'Admin General',
-                'password' => Hash::make('tu_contrasena_aqui'), 
+                'password' => Hash::make('1234'), 
                 'rol' => 'admin'
             ]
         );
