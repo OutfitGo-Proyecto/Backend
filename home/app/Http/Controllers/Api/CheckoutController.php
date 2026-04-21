@@ -104,6 +104,21 @@ class CheckoutController extends Controller
         }
     }
 
+    public function validarCupon(Request $request)
+    {
+        $request->validate(['codigo' => 'required|string']);
+
+        $cupon = \App\Models\Cupon::where('codigo', strtoupper($request->codigo))
+            ->where('is_active', true)
+            ->first();
+
+        if (!$cupon) {
+            return response()->json(['message' => 'Cupón no válido o caducado.'], 404);
+        }
+
+        return response()->json(['cupon' => $cupon], 200);
+    }
+
     public function confirmarPago(Request $request)
     {
         $request->validate([

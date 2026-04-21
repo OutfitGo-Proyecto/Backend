@@ -75,4 +75,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/addresses/{id}', [AddressController::class, 'update']);
     Route::delete('/addresses/{id}', [AddressController::class, 'destroy']);
     Route::patch('/addresses/{id}/set-primary', [AddressController::class, 'setPrimary']);
+
+    // Cupones
+    Route::post('/cupon/validar', [\App\Http\Controllers\Api\CheckoutController::class, 'validarCupon']);
 });
