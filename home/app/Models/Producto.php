@@ -73,4 +73,9 @@ class Producto extends Model
     'url_imagen_principal', 'precio', 'stock', 
     'marca_id', 'categoria_id'
 ];
+
+    public function historialPrecios()
+    {
+        return $this->hasMany(HistorialPrecio::class);
+    }
 }

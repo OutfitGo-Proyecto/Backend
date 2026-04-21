@@ -16,42 +16,65 @@ class CheckoutController extends Controller
 {
     public function iniciarPago(Request $request)
     {
+        // 1. Validamos que Angular nos manda la dirección Y los productos
         $request->validate([
-            'address_id' => 'required|integer'
+            'address_id' => 'required|integer',
+            'productos' => 'required|array|min:1',
+            // Aseguramos que cada producto traiga su ID de variante y la cantidad
+            'productos.*.producto_variante_id' => 'required|integer', 
+            'productos.*.cantidad' => 'required|integer|min:1',
         ]);
 
         /** @var \App\Models\User $user */
         $user = $request->user();
-        
         $address = $user->addresses()->findOrFail($request->address_id);
 
-        $cartItems = CartItem::with(['variante.producto', 'variante.color', 'variante.talla'])
-            ->where('user_id', $user->id)
-            ->get();
-
-        if ($cartItems->isEmpty()) {
-            return response()->json(['message' => 'El carrito está vacío.'], 400);
-        }
-
         $total = 0;
-        
-        foreach ($cartItems as $item) {
-            $variante = $item->variante;
+        $orderItemsData = [];
+        $line_items = [];
+
+        // 2. Recorremos lo que manda Angular, pero BUSCAMOS EL PRECIO REAL en la BD por seguridad
+        foreach ($request->productos as $item) {
+            $variante = ProductoVariante::with(['producto', 'color', 'talla'])
+                        ->find($item['producto_variante_id']);
+
             if (!$variante) {
-                return response()->json(['message' => 'Error: El producto ya no tiene variantes disponibles.'], 422);
+                return response()->json(['message' => 'Error: Una de las prendas ya no está disponible.'], 422);
             }
 
-            if ($variante->stock < $item->cantidad) {
+            if ($variante->stock < $item['cantidad']) {
                 return response()->json([
                     'message' => "Stock insuficiente para: {$variante->producto->nombre} (Talla: {$variante->talla->nombre})"
                 ], 422);
             }
-            $total += $variante->producto->precio * $item->cantidad;
+
+            // Calculamos el total con el precio real de la BD
+            $total += $variante->producto->precio * $item['cantidad'];
+
+            $orderItemsData[] = [
+                'producto_id'          => $variante->producto_id,
+                'producto_variante_id' => $variante->id,
+                'cantidad'             => $item['cantidad'],
+                'precio_unitario'      => $variante->producto->precio,
+            ];
+
+            $unit_amount = (int) round($variante->producto->precio * 100);
+            $line_items[] = [
+                'price_data' => [
+                    'currency' => 'eur',
+                    'product_data' => [
+                        'name' => "{$variante->producto->nombre} - {$variante->color->nombre} / {$variante->talla->nombre}"
+                    ],
+                    'unit_amount' => $unit_amount,
+                ],
+                'quantity' => $item['cantidad'],
+            ];
         }
 
         try {
             DB::beginTransaction();
 
+            // 3. Creamos el pedido
             $order = Order::create([
                 'user_id'       => $user->id,
                 'total'         => $total,
@@ -66,33 +89,13 @@ class CheckoutController extends Controller
                 'notas'         => $request->notas ?? '',
             ]);
 
-            foreach ($cartItems as $item) {
-                $order->orderItems()->create([
-                    'producto_id'          => $item->variante->producto_id,
-                    'producto_variante_id' => $item->producto_variante_id,
-                    'cantidad'             => $item->cantidad,
-                    'precio_unitario'      => $item->variante->producto->precio,
-                ]);
+            // 4. Guardamos los items del pedido que preparamos antes
+            foreach ($orderItemsData as $data) {
+                $order->orderItems()->create($data);
             }
 
+            // 5. Llamamos a Stripe
             Stripe::setApiKey(config('services.stripe.secret'));
-
-            $line_items = [];
-            foreach ($cartItems as $item) {
-                $unit_amount = (int) round($item->variante->producto->precio * 100);
-
-                $line_items[] = [
-                    'price_data' => [
-                        'currency' => 'eur',
-                        'product_data' => [
-                            'name' => "{$item->variante->producto->nombre} - {$item->variante->color->nombre} / {$item->variante->talla->nombre}"
-                        ],
-                        'unit_amount' => $unit_amount,
-                    ],
-                    'quantity' => $item->cantidad,
-                ];
-            }
-
             $frontend_url = env('FRONTEND_URL', 'https://outfitgo.duckdns.org');
 
             $checkout_session = Session::create([
