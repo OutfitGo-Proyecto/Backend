@@ -11,6 +11,7 @@ use Stripe\Stripe;
 use Stripe\Checkout\Session;
 use App\Mail\ConfirmacionCompra;
 use Illuminate\Support\Facades\Mail;
+use App\Models\ProductoVariante;
 
 class CheckoutController extends Controller
 {
