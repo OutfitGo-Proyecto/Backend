@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Crear usuario administrador General
+// 1. Crear usuario administrador General
         User::updateOrCreate(
             ['email' => 'admin@outfitgo.com'], 
             [                                 
@@ -26,30 +26,35 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        //Creo Usuario Administrador de productos
-        User::factory()->create([
-            'name' => 'Admin Productos',
-            'email' => 'adminProductos@gmail.com',
-            'password' => bcrypt('productos123'),
-            'rol' => 'admin_productos',
-        ]);
+        // Creo Usuario Administrador de productos
+        User::updateOrCreate(
+            ['email' => 'adminProductos@gmail.com'],
+            [
+                'name' => 'Admin Productos',
+                'password' => Hash::make('productos123'),
+                'rol' => 'admin_productos'
+            ]
+        );
 
         // Creo Usuario Administrador de Usuarios
-        User::factory()->create([
-            'name' => 'Admin Usuarios',
-            'email' => 'adminUsuarios@gmail.com',
-            'password' => bcrypt('usuarios123'),
-            'rol' => 'admin_usuarios',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'adminUsuarios@gmail.com'],
+            [
+                'name' => 'Admin Usuarios',
+                'password' => Hash::make('usuarios123'),
+                'rol' => 'admin_usuarios'
+            ]
+        );
 
         // Creo Usuario Cliente
-        User::factory()->create([
-            'name' => 'Usuario Cliente',
-            'email' => 'cliente@gmail.com',
-            'password' => bcrypt('cliente123'),
-            'rol' => 'cliente',
-        ]);
-
+        User::updateOrCreate(
+            ['email' => 'cliente@gmail.com'],
+            [
+                'name' => 'Usuario Cliente',
+                'password' => Hash::make('cliente123'),
+                'rol' => 'cliente'
+            ]
+        );
         // 2. Crear Categorías Reales
         $categorias = [
             'Zapatillas' => Categoria::create(['nombre' => 'Zapatillas', 'slug' => 'zapatillas']),
