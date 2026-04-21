@@ -55,28 +55,28 @@ class DatabaseSeeder extends Seeder
                 'rol' => 'cliente'
             ]
         );
-        // 2. Crear Categorías Reales
+// 2. Crear Categorías Reales
         $categorias = [
-            'Zapatillas' => Categoria::create(['nombre' => 'Zapatillas', 'slug' => 'zapatillas']),
-            'Camisetas' => Categoria::create(['nombre' => 'Camisetas', 'slug' => 'camisetas']),
-            'Sudaderas' => Categoria::create(['nombre' => 'Sudaderas', 'slug' => 'sudaderas']),
-            'Pantalones' => Categoria::create(['nombre' => 'Pantalones', 'slug' => 'pantalones']),
-            'Chaquetas' => Categoria::create(['nombre' => 'Chaquetas', 'slug' => 'chaquetas']),
-            'Vestidos' => Categoria::create(['nombre' => 'Vestidos', 'slug' => 'vestidos']),
-            'Accesorios' => Categoria::create(['nombre' => 'Accesorios', 'slug' => 'accesorios']),
+            'Zapatillas' => Categoria::updateOrCreate(['slug' => 'zapatillas'], ['nombre' => 'Zapatillas']),
+            'Camisetas' => Categoria::updateOrCreate(['slug' => 'camisetas'], ['nombre' => 'Camisetas']),
+            'Sudaderas' => Categoria::updateOrCreate(['slug' => 'sudaderas'], ['nombre' => 'Sudaderas']),
+            'Pantalones' => Categoria::updateOrCreate(['slug' => 'pantalones'], ['nombre' => 'Pantalones']),
+            'Chaquetas' => Categoria::updateOrCreate(['slug' => 'chaquetas'], ['nombre' => 'Chaquetas']),
+            'Vestidos' => Categoria::updateOrCreate(['slug' => 'vestidos'], ['nombre' => 'Vestidos']),
+            'Accesorios' => Categoria::updateOrCreate(['slug' => 'accesorios'], ['nombre' => 'Accesorios']),
         ];
 
         // 3. Crear Marcas Reales
         $marcas = [
-            'Nike' => Marca::create(['nombre' => 'Nike', 'slug' => 'nike', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg']),
-            'Adidas' => Marca::create(['nombre' => 'Adidas', 'slug' => 'adidas', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg']),
-            'Puma' => Marca::create(['nombre' => 'Puma', 'slug' => 'puma', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/8/88/Puma_Logo.svg']),
-            'Zara' => Marca::create(['nombre' => 'Zara', 'slug' => 'zara', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/f/fd/Zara_Logo.svg']),
-            'Levis' => Marca::create(['nombre' => 'Levis', 'slug' => 'levis', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/4/41/Levi%27s_logo.svg']),
-            'New Balance' => Marca::create(['nombre' => 'New Balance', 'slug' => 'new-balance', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg']),
-            'Vans' => Marca::create(['nombre' => 'Vans', 'slug' => 'vans', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Vans_logo.svg']),
+            'Nike' => Marca::updateOrCreate(['slug' => 'nike'], ['nombre' => 'Nike', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg']),
+            'Adidas' => Marca::updateOrCreate(['slug' => 'adidas'], ['nombre' => 'Adidas', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg']),
+            'Puma' => Marca::updateOrCreate(['slug' => 'puma'], ['nombre' => 'Puma', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/8/88/Puma_Logo.svg']),
+            'Zara' => Marca::updateOrCreate(['slug' => 'zara'], ['nombre' => 'Zara', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/f/fd/Zara_Logo.svg']),
+            'Levis' => Marca::updateOrCreate(['slug' => 'levis'], ['nombre' => 'Levis', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/4/41/Levi%27s_logo.svg']),
+            'New Balance' => Marca::updateOrCreate(['slug' => 'new-balance'], ['nombre' => 'New Balance', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg']),
+            'Vans' => Marca::updateOrCreate(['slug' => 'vans'], ['nombre' => 'Vans', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Vans_logo.svg']),
         ];
-
+        
         // 4. Crear Tallas Reales
         $tallasData = [
             'Adulto' => ['XS','S','M','L','XL','XXL'],
@@ -97,16 +97,16 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        // 5. Crear Colores
+// 5. Crear Colores
         $colores = [
-            'Negro' => Color::create(['nombre' => 'Negro', 'hex_code' => '#000000']),
-            'Blanco' => Color::create(['nombre' => 'Blanco', 'hex_code' => '#FFFFFF']),
-            'Gris' => Color::create(['nombre' => 'Gris', 'hex_code' => '#808080']),
-            'Azul Marino' => Color::create(['nombre' => 'Azul Marino', 'hex_code' => '#000080']),
-            'Rojo' => Color::create(['nombre' => 'Rojo', 'hex_code' => '#FF0000']),
-            'Beige' => Color::create(['nombre' => 'Beige', 'hex_code' => '#F5F5DC']),
-            'Verde Oliva' => Color::create(['nombre' => 'Verde Oliva', 'hex_code' => '#556B2F']),
-            'Rosa' => Color::create(['nombre' => 'Rosa', 'hex_code' => '#FFC0CB']),
+            'Negro' => Color::updateOrCreate(['nombre' => 'Negro'], ['hex_code' => '#000000']),
+            'Blanco' => Color::updateOrCreate(['nombre' => 'Blanco'], ['hex_code' => '#FFFFFF']),
+            'Gris' => Color::updateOrCreate(['nombre' => 'Gris'], ['hex_code' => '#808080']),
+            'Azul Marino' => Color::updateOrCreate(['nombre' => 'Azul Marino'], ['hex_code' => '#000080']),
+            'Rojo' => Color::updateOrCreate(['nombre' => 'Rojo'], ['hex_code' => '#FF0000']),
+            'Beige' => Color::updateOrCreate(['nombre' => 'Beige'], ['hex_code' => '#F5F5DC']),
+            'Verde Oliva' => Color::updateOrCreate(['nombre' => 'Verde Oliva'], ['hex_code' => '#556B2F']),
+            'Rosa' => Color::updateOrCreate(['nombre' => 'Rosa'], ['hex_code' => '#FFC0CB']),
         ];
 
         // 6. CREAR PRODUCTOS REALISTAS COMPLETOS
