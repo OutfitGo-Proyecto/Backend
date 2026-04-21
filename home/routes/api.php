@@ -9,20 +9,26 @@ use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\Api\PedidoController;
 use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\ResenaPaginaController;
+use \App\Http\Controllers\Api\SocialAuthController;
+use App\Http\Controllers\Api\AdminOutfitWizardController;
 
 
 
 // Rutas Públicas de Productos
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::get('/productos/{slug}', [ProductoController::class, 'show']);
+Route::get('/resenas-pagina', [ResenaPaginaController::class, 'index']);
 
 // Rutas Públicas de Autenticación
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
+    ->name('verification.verify');
 
 // Autenticación Social (Google)
-Route::get('/auth/google/redirect', [\App\Http\Controllers\Api\SocialAuthController::class, 'redirectToGoogle']);
-Route::get('/auth/google/callback', [\App\Http\Controllers\Api\SocialAuthController::class, 'handleGoogleCallback']);
+Route::get('/auth/google/redirect', [SocialAuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [SocialAuthController::class, 'handleGoogleCallback']);
 
 
 
@@ -78,4 +84,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Cupones
     Route::post('/cupon/validar', [\App\Http\Controllers\Api\CheckoutController::class, 'validarCupon']);
+
+    Route::get('/productos/{id}/historial', [ProductoController::class, 'historialPrecios']);
+
+    Route::post('/resenas-pagina', [ResenaPaginaController::class, 'store']);
+    Route::get('/resenas-pagina', [ResenaPaginaController::class, 'index']);
+    Route::post('/outfit-wizard', [AdminOutfitWizardController::class, 'generate']);
 });

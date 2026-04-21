@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use App\Models\Marca;
 use App\Models\Categoria;
 use App\Models\Producto;
@@ -16,60 +17,67 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Crear usuario administrador General
-        User::factory()->create([
-            'name' => 'Admin General',
-            'email' => 'admin@outfitgo.com',
-            'password' => bcrypt('password'),
-            'rol' => 'admin',
-        ]);
+// 1. Crear usuario administrador General
+        User::updateOrCreate(
+            ['email' => 'admin@outfitgo.com'], 
+            [                                 
+                'name' => 'Admin General',
+                'password' => Hash::make('1234'), 
+                'rol' => 'admin'
+            ]
+        );
 
-        //Creo Usuario Administrador de productos
-        User::factory()->create([
-            'name' => 'Admin Productos',
-            'email' => 'adminProductos@gmail.com',
-            'password' => bcrypt('productos123'),
-            'rol' => 'admin_productos',
-        ]);
+        // Creo Usuario Administrador de productos
+        User::updateOrCreate(
+            ['email' => 'adminProductos@gmail.com'],
+            [
+                'name' => 'Admin Productos',
+                'password' => Hash::make('productos123'),
+                'rol' => 'admin_productos'
+            ]
+        );
 
         // Creo Usuario Administrador de Usuarios
-        User::factory()->create([
-            'name' => 'Admin Usuarios',
-            'email' => 'adminUsuarios@gmail.com',
-            'password' => bcrypt('usuarios123'),
-            'rol' => 'admin_usuarios',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'adminUsuarios@gmail.com'],
+            [
+                'name' => 'Admin Usuarios',
+                'password' => Hash::make('usuarios123'),
+                'rol' => 'admin_usuarios'
+            ]
+        );
 
         // Creo Usuario Cliente
-        User::factory()->create([
-            'name' => 'Usuario Cliente',
-            'email' => 'cliente@gmail.com',
-            'password' => bcrypt('cliente123'),
-            'rol' => 'cliente',
-        ]);
-
-        // 2. Crear Categorías Reales
+        User::updateOrCreate(
+            ['email' => 'cliente@gmail.com'],
+            [
+                'name' => 'Usuario Cliente',
+                'password' => Hash::make('cliente123'),
+                'rol' => 'cliente'
+            ]
+        );
+// 2. Crear Categorías Reales
         $categorias = [
-            'Zapatillas' => Categoria::create(['nombre' => 'Zapatillas', 'slug' => 'zapatillas']),
-            'Camisetas' => Categoria::create(['nombre' => 'Camisetas', 'slug' => 'camisetas']),
-            'Sudaderas' => Categoria::create(['nombre' => 'Sudaderas', 'slug' => 'sudaderas']),
-            'Pantalones' => Categoria::create(['nombre' => 'Pantalones', 'slug' => 'pantalones']),
-            'Chaquetas' => Categoria::create(['nombre' => 'Chaquetas', 'slug' => 'chaquetas']),
-            'Vestidos' => Categoria::create(['nombre' => 'Vestidos', 'slug' => 'vestidos']),
-            'Accesorios' => Categoria::create(['nombre' => 'Accesorios', 'slug' => 'accesorios']),
+            'Zapatillas' => Categoria::updateOrCreate(['slug' => 'zapatillas'], ['nombre' => 'Zapatillas']),
+            'Camisetas' => Categoria::updateOrCreate(['slug' => 'camisetas'], ['nombre' => 'Camisetas']),
+            'Sudaderas' => Categoria::updateOrCreate(['slug' => 'sudaderas'], ['nombre' => 'Sudaderas']),
+            'Pantalones' => Categoria::updateOrCreate(['slug' => 'pantalones'], ['nombre' => 'Pantalones']),
+            'Chaquetas' => Categoria::updateOrCreate(['slug' => 'chaquetas'], ['nombre' => 'Chaquetas']),
+            'Vestidos' => Categoria::updateOrCreate(['slug' => 'vestidos'], ['nombre' => 'Vestidos']),
+            'Accesorios' => Categoria::updateOrCreate(['slug' => 'accesorios'], ['nombre' => 'Accesorios']),
         ];
 
         // 3. Crear Marcas Reales
         $marcas = [
-            'Nike' => Marca::create(['nombre' => 'Nike', 'slug' => 'nike', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg']),
-            'Adidas' => Marca::create(['nombre' => 'Adidas', 'slug' => 'adidas', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg']),
-            'Puma' => Marca::create(['nombre' => 'Puma', 'slug' => 'puma', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/8/88/Puma_Logo.svg']),
-            'Zara' => Marca::create(['nombre' => 'Zara', 'slug' => 'zara', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/f/fd/Zara_Logo.svg']),
-            'Levis' => Marca::create(['nombre' => 'Levis', 'slug' => 'levis', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/4/41/Levi%27s_logo.svg']),
-            'New Balance' => Marca::create(['nombre' => 'New Balance', 'slug' => 'new-balance', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg']),
-            'Vans' => Marca::create(['nombre' => 'Vans', 'slug' => 'vans', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Vans_logo.svg']),
+            'Nike' => Marca::updateOrCreate(['slug' => 'nike'], ['nombre' => 'Nike', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg']),
+            'Adidas' => Marca::updateOrCreate(['slug' => 'adidas'], ['nombre' => 'Adidas', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg']),
+            'Puma' => Marca::updateOrCreate(['slug' => 'puma'], ['nombre' => 'Puma', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/8/88/Puma_Logo.svg']),
+            'Zara' => Marca::updateOrCreate(['slug' => 'zara'], ['nombre' => 'Zara', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/f/fd/Zara_Logo.svg']),
+            'Levis' => Marca::updateOrCreate(['slug' => 'levis'], ['nombre' => 'Levis', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/4/41/Levi%27s_logo.svg']),
+            'New Balance' => Marca::updateOrCreate(['slug' => 'new-balance'], ['nombre' => 'New Balance', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/e/ea/New_Balance_logo.svg']),
+            'Vans' => Marca::updateOrCreate(['slug' => 'vans'], ['nombre' => 'Vans', 'url_logo' => 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Vans_logo.svg']),
         ];
-
+        
         // 4. Crear Tallas Reales
         $tallasData = [
             'Adulto' => ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
@@ -90,16 +98,16 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        // 5. Crear Colores
+// 5. Crear Colores
         $colores = [
-            'Negro' => Color::create(['nombre' => 'Negro', 'hex_code' => '#000000']),
-            'Blanco' => Color::create(['nombre' => 'Blanco', 'hex_code' => '#FFFFFF']),
-            'Gris' => Color::create(['nombre' => 'Gris', 'hex_code' => '#808080']),
-            'Azul Marino' => Color::create(['nombre' => 'Azul Marino', 'hex_code' => '#000080']),
-            'Rojo' => Color::create(['nombre' => 'Rojo', 'hex_code' => '#FF0000']),
-            'Beige' => Color::create(['nombre' => 'Beige', 'hex_code' => '#F5F5DC']),
-            'Verde Oliva' => Color::create(['nombre' => 'Verde Oliva', 'hex_code' => '#556B2F']),
-            'Rosa' => Color::create(['nombre' => 'Rosa', 'hex_code' => '#FFC0CB']),
+            'Negro' => Color::updateOrCreate(['nombre' => 'Negro'], ['hex_code' => '#000000']),
+            'Blanco' => Color::updateOrCreate(['nombre' => 'Blanco'], ['hex_code' => '#FFFFFF']),
+            'Gris' => Color::updateOrCreate(['nombre' => 'Gris'], ['hex_code' => '#808080']),
+            'Azul Marino' => Color::updateOrCreate(['nombre' => 'Azul Marino'], ['hex_code' => '#000080']),
+            'Rojo' => Color::updateOrCreate(['nombre' => 'Rojo'], ['hex_code' => '#FF0000']),
+            'Beige' => Color::updateOrCreate(['nombre' => 'Beige'], ['hex_code' => '#F5F5DC']),
+            'Verde Oliva' => Color::updateOrCreate(['nombre' => 'Verde Oliva'], ['hex_code' => '#556B2F']),
+            'Rosa' => Color::updateOrCreate(['nombre' => 'Rosa'], ['hex_code' => '#FFC0CB']),
         ];
 
         // 6. CREAR PRODUCTOS REALISTAS COMPLETOS
@@ -230,26 +238,27 @@ class DatabaseSeeder extends Seeder
             ]
         ];
 
-        // 7. Insertar los productos y SUS VARIANTES
+// 7. Insertar los productos y SUS VARIANTES
         foreach ($productosReales as $pData) {
-            $producto = Producto::create([
-                'nombre' => $pData['nombre'],
-                'slug' => $makeSlug($pData['nombre']),
-                'descripcion' => $pData['descripcion'],
-                'publico' => $pData['publico'],
-                'url_imagen_principal' => $pData['url_imagen_principal'],
-                'precio' => $pData['precio'],
-                'stock' => $pData['stock'], // Lo mantenemos como informativo
-                'marca_id' => $pData['marca'],
-                'categoria_id' => $pData['categoria'],
-            ]);
+            $producto = Producto::updateOrCreate(
+                ['slug' => $makeSlug($pData['nombre'])], // Busca por slug
+                [
+                    'nombre' => $pData['nombre'],
+                    'descripcion' => $pData['descripcion'],
+                    'publico' => $pData['publico'],
+                    'url_imagen_principal' => $pData['url_imagen_principal'],
+                    'precio' => $pData['precio'],
+                    'stock' => $pData['stock'],
+                    'marca_id' => $pData['marca'],
+                    'categoria_id' => $pData['categoria'],
+                ]
+            );
 
             // Sincronizar relaciones pivote
             $producto->tallas()->sync($pData['tallas']);
             $producto->colores()->sync($pData['colores']);
 
-            // 🌟 AÑADIDO: CREAR LAS VARIANTES DE STOCK
-            // 🌟 CREAR LAS VARIANTES CON STOCK MUY VARIADO PARA PRUEBAS
+            // 🌟 CREAR LAS VARIANTES (Evitando duplicados con updateOrCreate)
             foreach ($pData['tallas'] as $tallaId) {
                 foreach ($pData['colores'] as $colorId) {
 
@@ -257,23 +266,30 @@ class DatabaseSeeder extends Seeder
                     // el resto tendrá un número aleatorio muy dispar entre 1 y 150.
                     $stockDemo = (rand(1, 4) === 1) ? 0 : rand(1, 150);
 
-                    ProductoVariante::create([
-                        'producto_id' => $producto->id,
-                        'talla_id' => $tallaId,
-                        'color_id' => $colorId,
-                        'stock' => $stockDemo
-                    ]);
+                    ProductoVariante::updateOrCreate(
+                        [
+                            'producto_id' => $producto->id,
+                            'talla_id' => $tallaId,
+                            'color_id' => $colorId,
+                        ],
+                        [
+                            'stock' => $stockDemo
+                        ]
+                    );
                 }
             }
 
-            // Generar 3 imágenes secundarias
-            for ($i = 1; $i <= 3; $i++) {
-                $producto->imagenes()->create([
-                    'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . '/800/800'
-                ]);
+            // Generar 3 imágenes secundarias (SOLO si no tiene ya imágenes creadas)
+            if ($producto->imagenes()->count() === 0) {
+                for ($i = 1; $i <= 3; $i++) {
+                    $producto->imagenes()->create([
+                        'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . '/800/800'
+                    ]);
+                }
             }
         }
 
+        // AQUÍ ESTÁ TU LISTA DE CLONES RECUPERADA
         $clonesData = [
             [
                 'base' => $productosReales[0],
@@ -312,17 +328,20 @@ class DatabaseSeeder extends Seeder
         // 8. Insertar los clones y SUS VARIANTES
         foreach ($clonesData as $clone) {
             $base = $clone['base'];
-            $producto = Producto::create([
-                'nombre' => $clone['nombre'],
-                'slug' => $makeSlug($clone['nombre']),
-                'descripcion' => $clone['descripcion'],
-                'publico' => isset($clone['publico']) ? $clone['publico'] : $base['publico'],
-                'url_imagen_principal' => $base['url_imagen_principal'],
-                'precio' => $base['precio'],
-                'stock' => $base['stock'],
-                'marca_id' => $base['marca'],
-                'categoria_id' => $base['categoria'],
-            ]);
+            
+            $producto = Producto::updateOrCreate(
+                ['slug' => $makeSlug($clone['nombre'])],
+                [
+                    'nombre' => $clone['nombre'],
+                    'descripcion' => $clone['descripcion'],
+                    'publico' => isset($clone['publico']) ? $clone['publico'] : $base['publico'],
+                    'url_imagen_principal' => $base['url_imagen_principal'],
+                    'precio' => $base['precio'],
+                    'stock' => $base['stock'],
+                    'marca_id' => $base['marca'],
+                    'categoria_id' => $base['categoria'],
+                ]
+            );
 
             $tallasAUsar = isset($clone['tallas']) ? $clone['tallas'] : $base['tallas'];
             $coloresAUsar = isset($clone['colores']) ? $clone['colores'] : $base['colores'];
@@ -331,22 +350,64 @@ class DatabaseSeeder extends Seeder
             $producto->tallas()->sync($tallasAUsar);
             $producto->colores()->sync($coloresAUsar);
 
-            // 🌟 AÑADIDO: CREAR LAS VARIANTES DE STOCK PARA LOS CLONES
+            // 🌟 CREAR LAS VARIANTES DE STOCK PARA LOS CLONES
             foreach ($tallasAUsar as $tallaId) {
                 foreach ($coloresAUsar as $colorId) {
-                    ProductoVariante::create([
-                        'producto_id' => $producto->id,
-                        'talla_id' => $tallaId,
-                        'color_id' => $colorId,
-                        'stock' => rand(5, 25)
+                    ProductoVariante::updateOrCreate(
+                        [
+                            'producto_id' => $producto->id,
+                            'talla_id' => $tallaId,
+                            'color_id' => $colorId,
+                        ],
+                        [
+                            'stock' => rand(5, 25)
+                        ]
+                    );
+                }
+            }
+
+            // Generar imágenes clones (SOLO si no tiene ya)
+            if ($producto->imagenes()->count() === 0) {
+                for ($i = 1; $i <= 3; $i++) {
+                    $producto->imagenes()->create([
+                        'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . 'clone/800/800'
                     ]);
                 }
             }
 
-            for ($i = 1; $i <= 3; $i++) {
-                $producto->imagenes()->create([
-                    'url_imagen' => 'https://picsum.photos/seed/' . $producto->id . $i . 'clone/800/800'
-                ]);
+            // 9. CREAR CUPONES DE DESCUENTO PARA PRUEBAS
+            $cupones = [
+                [
+                    'codigo' => 'BIENVENIDA10',
+                    'tipo' => 'porcentaje',
+                    'valor' => 10.00, // 10% de descuento
+                    'is_active' => true
+                ],
+                [
+                    'codigo' => 'MENOS5EUROS',
+                    'tipo' => 'fijo',
+                    'valor' => 5.00, // 5€ de descuento directo
+                    'is_active' => true
+                ],
+                [
+                    'codigo' => 'CRAZY20',
+                    'tipo' => 'porcentaje',
+                    'valor' => 20.00, // 20% de descuento
+                    'is_active' => true
+                ],
+                [
+                    'codigo' => 'CADUCADO50',
+                    'tipo' => 'porcentaje',
+                    'valor' => 50.00, // Cupón inactivo para probar que el backend da error
+                    'is_active' => false
+                ]
+            ];
+
+            foreach ($cupones as $cuponData) {
+                Cupon::firstOrCreate(
+                    ['codigo' => $cuponData['codigo']],
+                    $cuponData
+                );
             }
 
             // 9. CREAR CUPONES DE DESCUENTO PARA PRUEBAS
@@ -386,5 +447,9 @@ class DatabaseSeeder extends Seeder
         }
 
         echo "✅ Base de datos poblada con éxito con catálogos hiper-realistas y SKUs de Variantes generados.\n";
+        $this->call([
+            OutfitTestSeeder::class
+        ]);
     }
 }
+

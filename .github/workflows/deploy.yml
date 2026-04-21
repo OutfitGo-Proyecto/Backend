@@ -28,7 +28,11 @@ jobs:
             grep -q "^GOOGLE_CLIENT_ID=" home/.env && sed -i "s|^GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}|" home/.env || echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> home/.env
             grep -q "^GOOGLE_CLIENT_SECRET=" home/.env && sed -i "s|^GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}|" home/.env || echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> home/.env
             grep -q "^GOOGLE_REDIRECT_URI=" home/.env && sed -i "s|^GOOGLE_REDIRECT_URI=.*|GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}|" home/.env || echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> home/.env
-
+            # INYECTAR NUEVOS SECRETOS (Stripe, Correo e IAs)
+            grep -q "^STRIPE_SECRET=" home/.env && sed -i "s|^STRIPE_SECRET=.*|STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}|" home/.env || echo "STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}" >> home/.env
+            grep -q "^MAIL_PASSWORD=" home/.env && sed -i "s|^MAIL_PASSWORD=.*|MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}|" home/.env || echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> home/.env
+            grep -q "^GROQ_API_KEY=" home/.env && sed -i "s|^GROQ_API_KEY=.*|GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}|" home/.env || echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> home/.env
+            grep -q "^GEMINI_API_KEY=" home/.env && sed -i "s|^GEMINI_API_KEY=.*|GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}|" home/.env || echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> home/.env
 
             # 1. Bajamos contenedores anteriores
             sudo docker compose down --remove-orphans
@@ -50,4 +54,4 @@ jobs:
             sudo docker compose exec -e DB_HOST=laravel_db -T app php artisan migrate --force
             
             # 7. Opcional: Sembrado de datos (Descomentar para poblar la DB automáticamente en cada despliegue)
-            # sudo docker compose exec -T app php artisan db:seed --force
+            sudo docker compose exec -T app php artisan db:seed --force
