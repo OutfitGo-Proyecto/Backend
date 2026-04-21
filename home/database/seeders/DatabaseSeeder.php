@@ -16,12 +16,14 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Crear usuario administrador General
-        User::factory()->create([
-            'name' => 'Admin General',
-            'email' => 'admin@outfitgo.com',
-            'password' => bcrypt('password'),
-            'rol' => 'admin',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'admin@outfitgo.com'], 
+            [                                 
+                'name' => 'Admin General',
+                'password' => Hash::make('tu_contrasena_aqui'), 
+                'rol' => 'admin'
+            ]
+        );
 
         //Creo Usuario Administrador de productos
         User::factory()->create([
