@@ -8,6 +8,8 @@ use App\Observers\ProductoObserver;
 use \Illuminate\Support\Facades\URL;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
+use App\Models\ProductoVariante;
+use App\Observers\ProductoVarianteObserver;
 
 
 
@@ -40,5 +42,6 @@ class AppServiceProvider extends ServiceProvider
                 ->line('Si no creaste una cuenta, no es necesario realizar ninguna otra acción.')
                 ->salutation('Saludos, ' . config('app.name'));
         });
+        ProductoVariante::observe(ProductoVarianteObserver::class);
     }
 }
