@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Models\Producto;
 use App\Observers\ProductoObserver;
+use App\Models\ProductoVariante;
+use App\Observers\ProductoVarianteObserver;
 
 
 
@@ -24,5 +26,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Producto::observe(ProductoObserver::class);
+        ProductoVariante::observe(ProductoVarianteObserver::class);
     }
 }
