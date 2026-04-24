@@ -154,7 +154,12 @@ class CheckoutController extends Controller
                 return response()->json(['message' => 'La sesión de Stripe no contiene un pedido válido.'], 422);
             }
 
-            $order = Order::with(['user', 'orderItems.variante'])->findOrFail($orderId);
+            $order = Order::with([
+                'user',
+                'orderItems.variante.producto',
+                'orderItems.variante.color',
+                'orderItems.variante.talla'
+            ])->findOrFail($orderId);
 
             if ((int) $order->user_id !== (int) $request->user()->id) {
                 return response()->json(['message' => 'No autorizado para confirmar este pedido.'], 403);
