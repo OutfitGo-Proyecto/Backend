@@ -120,4 +120,9 @@ class Producto extends Model
     {
         return $this->hasMany(HistorialPrecio::class);
     }
+
+    public function resenas()
+    {
+        return $this->hasMany(ResenaProducto::class);
+    }
 }
