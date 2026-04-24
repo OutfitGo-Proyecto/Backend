@@ -2,7 +2,9 @@
 
 namespace App\Observers;
 
+use App\Mail\ProductBackInStockMail;
 use App\Models\Producto;
+use Illuminate\Support\Facades\Mail;
 
 class ProductoObserver
 {
@@ -23,6 +25,21 @@ class ProductoObserver
             $producto->historialPrecios()->create([
                 'precio' => $producto->precio
             ]);
+        }
+
+        if ($producto->wasChanged('stock') && $producto->getOriginal('stock') == 0 && $producto->stock > 0) {
+            $this->notifyUsersBackInStock($producto);
+        }
+    }
+
+    protected function notifyUsersBackInStock(Producto $producto)
+    {
+        $favorites = $producto->favorites()->with('user')->get();
+
+        foreach ($favorites as $favorite) {
+            $user = $favorite->user;
+            // Mandamos a la cola usando queue()
+            Mail::to($user->email)->queue(new ProductBackInStockMail($producto));
         }
     }
 

@@ -10,6 +10,7 @@ use App\Models\Producto;
 use App\Models\ProductoVariante;
 use App\Models\Talla;
 use App\Models\Color;
+use App\Models\Cupon;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -79,11 +80,11 @@ class DatabaseSeeder extends Seeder
         
         // 4. Crear Tallas Reales
         $tallasData = [
-            'Adulto' => ['XS','S','M','L','XL','XXL'],
-            'Infantil' => ['4Y','6Y','8Y','10Y','12Y','14Y'],
-            'Calzado' => ['36','37','38','39','40','41','42','43','44','45']
+            'Adulto' => ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+            'Infantil' => ['4Y', '6Y', '8Y', '10Y', '12Y', '14Y'],
+            'Calzado' => ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45']
         ];
-        
+
         $tallasObjects = [
             'Adulto' => [],
             'Infantil' => [],
@@ -110,7 +111,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         // 6. CREAR PRODUCTOS REALISTAS COMPLETOS
-        $makeSlug = function($string) {
+        $makeSlug = function ($string) {
             return strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $string), '-'));
         };
 
@@ -260,6 +261,9 @@ class DatabaseSeeder extends Seeder
             // 🌟 CREAR LAS VARIANTES (Evitando duplicados con updateOrCreate)
             foreach ($pData['tallas'] as $tallaId) {
                 foreach ($pData['colores'] as $colorId) {
+
+                    // Truco matemático: 1 de cada 4 variantes tendrá stock 0 (Agotado), 
+                    // el resto tendrá un número aleatorio muy dispar entre 1 y 150.
                     $stockDemo = (rand(1, 4) === 1) ? 0 : rand(1, 150);
 
                     ProductoVariante::updateOrCreate(
@@ -274,7 +278,7 @@ class DatabaseSeeder extends Seeder
                     );
                 }
             }
-            
+
             // Generar 3 imágenes secundarias (SOLO si no tiene ya imágenes creadas)
             if ($producto->imagenes()->count() === 0) {
                 for ($i = 1; $i <= 3; $i++) {
@@ -288,14 +292,14 @@ class DatabaseSeeder extends Seeder
         // AQUÍ ESTÁ TU LISTA DE CLONES RECUPERADA
         $clonesData = [
             [
-                'base' => $productosReales[0], 
-                'nombre' => 'Zapatillas Nike Air Force 1 Clásicas Negras', 
+                'base' => $productosReales[0],
+                'nombre' => 'Zapatillas Nike Air Force 1 Clásicas Negras',
                 'descripcion' => 'Desata absolutamente todo tu enorme potencial callejero vistiendo las legendarias e icónicas zapatillas Nike Air Force 1. Un diseño poderoso, agresivo y sumamente limpio enteramente tintado en un muy elegante y sobrio negro mate capaz de resistirse ferozmente a la abrumadora suciedad urbana. Confeccionadas partiendo de un resistente e inmaculado cuero premium liso, mantienen perfectamente oculta la sensacional tecnología especial Nike Air debajo del enorme grosor protector que nos aporta la gran suela de goma.',
                 'colores' => [$colores['Negro']->id]
             ],
             [
-                'base' => $productosReales[1], 
-                'nombre' => 'Sudadera con Capucha Adidas Infantil', 
+                'base' => $productosReales[1],
+                'nombre' => 'Sudadera con Capucha Adidas Infantil',
                 'descripcion' => 'Mantén enormemente abrigados y repletos de comodidades modernas a tus pequeñines preferidos durante el gélido invierno confiando plenamente en esta pequeña gran iteración de nuestra fantástica sudadera más famosa y aplaudida. Una pieza innegociable nacida desde Adidas Originals luciendo el llamativo e inmenso trébol mítico frontal. Construida priorizando siempre emplear los algodones naturales completamente amigables con el medio. Su gigantesco bolsillo de estilo canguro mantendrá escondidos esos juguetes.',
                 'publico' => 'infantil',
                 'tallas' => [$tallasObjects['Infantil']['8Y']->id, $tallasObjects['Infantil']['10Y']->id, $tallasObjects['Infantil']['12Y']->id]
@@ -370,6 +374,76 @@ class DatabaseSeeder extends Seeder
                     ]);
                 }
             }
+
+            // 9. CREAR CUPONES DE DESCUENTO PARA PRUEBAS
+            $cupones = [
+                [
+                    'codigo' => 'BIENVENIDA10',
+                    'tipo' => 'porcentaje',
+                    'valor' => 10.00, // 10% de descuento
+                    'is_active' => true
+                ],
+                [
+                    'codigo' => 'MENOS5EUROS',
+                    'tipo' => 'fijo',
+                    'valor' => 5.00, // 5€ de descuento directo
+                    'is_active' => true
+                ],
+                [
+                    'codigo' => 'CRAZY20',
+                    'tipo' => 'porcentaje',
+                    'valor' => 20.00, // 20% de descuento
+                    'is_active' => true
+                ],
+                [
+                    'codigo' => 'CADUCADO50',
+                    'tipo' => 'porcentaje',
+                    'valor' => 50.00, // Cupón inactivo para probar que el backend da error
+                    'is_active' => false
+                ]
+            ];
+
+            foreach ($cupones as $cuponData) {
+                Cupon::firstOrCreate(
+                    ['codigo' => $cuponData['codigo']],
+                    $cuponData
+                );
+            }
+
+            // 9. CREAR CUPONES DE DESCUENTO PARA PRUEBAS
+            $cupones = [
+                [
+                    'codigo' => 'BIENVENIDA10',
+                    'tipo' => 'porcentaje',
+                    'valor' => 10.00, // 10% de descuento
+                    'is_active' => true
+                ],
+                [
+                    'codigo' => 'MENOS5EUROS',
+                    'tipo' => 'fijo',
+                    'valor' => 5.00, // 5€ de descuento directo
+                    'is_active' => true
+                ],
+                [
+                    'codigo' => 'CRAZY20',
+                    'tipo' => 'porcentaje',
+                    'valor' => 20.00, // 20% de descuento
+                    'is_active' => true
+                ],
+                [
+                    'codigo' => 'CADUCADO50',
+                    'tipo' => 'porcentaje',
+                    'valor' => 50.00, // Cupón inactivo para probar que el backend da error
+                    'is_active' => false
+                ]
+            ];
+
+            foreach ($cupones as $cuponData) {
+                Cupon::firstOrCreate(
+                    ['codigo' => $cuponData['codigo']],
+                    $cuponData
+                );
+            }
         }
 
         echo "✅ Base de datos poblada con éxito con catálogos hiper-realistas y SKUs de Variantes generados.\n";
@@ -378,3 +452,4 @@ class DatabaseSeeder extends Seeder
         ]);
     }
 }
+
