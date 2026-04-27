@@ -90,6 +90,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/productos/{id}/historial', [ProductoController::class, 'historialPrecios']);
 
     Route::post('/resenas-pagina', [ResenaPaginaController::class, 'store']);
-    Route::get('/resenas-pagina', [ResenaPaginaController::class, 'index']);
     Route::post('/outfit-wizard', [AdminOutfitWizardController::class, 'generate']);
 });
