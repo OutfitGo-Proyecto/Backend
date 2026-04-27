@@ -108,4 +108,16 @@ class ProductoController extends Controller
 
         return response()->json($producto);
     }
+
+    public function historialPrecios($id)
+    {
+        $producto = Producto::with(['historialPrecios' => function($query) {
+            $query->orderBy('created_at', 'asc'); 
+        }])->findOrFail($id);
+
+        return response()->json([
+            'labels' => $producto->historialPrecios->map(fn($h) => $h->created_at->format('d/m')),
+            'precios' => $producto->historialPrecios->pluck('precio')
+        ]);
+    }
 }

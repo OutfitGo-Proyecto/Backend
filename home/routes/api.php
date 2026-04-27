@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\AdminOutfitWizardController;
 // Rutas Públicas de Productos
 Route::get('/productos', [ProductoController::class, 'index']);
 Route::get('/productos/{slug}', [ProductoController::class, 'show']);
+Route::get('/productos/{id}/historial', [ProductoController::class, 'historialPrecios']);
 Route::get('/resenas-pagina', [ResenaPaginaController::class, 'index']);
 
 // Rutas Públicas de Autenticación
@@ -87,7 +88,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Cupones
     Route::post('/cupon/validar', [\App\Http\Controllers\Api\CheckoutController::class, 'validarCupon']);
 
-    Route::get('/productos/{id}/historial', [ProductoController::class, 'historialPrecios']);
 
     Route::post('/resenas-pagina', [ResenaPaginaController::class, 'store']);
     Route::post('/outfit-wizard', [AdminOutfitWizardController::class, 'generate']);
