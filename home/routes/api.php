@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\ResenaPaginaController;
 use \App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\AdminOutfitWizardController;
+use App\Http\Controllers\Api\ResenaProductoController;
 
 
 
@@ -89,6 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cupon/validar', [\App\Http\Controllers\Api\CheckoutController::class, 'validarCupon']);
 
 
+    Route::post('/productos/{id}/resenas', [ResenaProductoController::class, 'store']);
     Route::post('/resenas-pagina', [ResenaPaginaController::class, 'store']);
     Route::post('/outfit-wizard', [AdminOutfitWizardController::class, 'generate']);
 });
