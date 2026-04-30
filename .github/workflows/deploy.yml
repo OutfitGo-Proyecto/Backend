@@ -32,6 +32,16 @@ jobs:
               sleep 10
             fi
 
+            # Crear Swap de 2GB si no existe (previene cuelgues por falta de RAM)
+            if [ ! -f /swapfile ]; then
+              echo "Creando archivo Swap de 2GB..."
+              sudo fallocate -l 2G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+              sudo chmod 600 /swapfile
+              sudo mkswap /swapfile
+              sudo swapon /swapfile
+              echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+            fi
+
             mkdir -p /home/ubuntu/backend
             cd /home/ubuntu/backend
             if [ ! -d ".git" ]; then
