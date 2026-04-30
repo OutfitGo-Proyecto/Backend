@@ -23,8 +23,22 @@ jobs:
           proxy_key: ${{ secrets.SSH_KEY }}
           command_timeout: 30m
           script: |
+            # Instalar Docker si no existe
+            if ! command -v docker &> /dev/null; then
+              echo "Instalando Docker..."
+              curl -fsSL https://get.docker.com -o get-docker.sh
+              sudo sh get-docker.sh
+              sudo usermod -aG docker ubuntu
+              sleep 10
+            fi
+
+            mkdir -p /home/ubuntu/backend
             cd /home/ubuntu/backend
-            git pull origin main
+            if [ ! -d ".git" ]; then
+              git clone -b main https://github.com/${{ github.repository }}.git .
+            else
+              git pull origin main
+            fi
 
             # Inyectar secretos de Google en el .env del servidor
             touch home/.env
