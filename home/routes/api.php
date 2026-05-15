@@ -28,6 +28,9 @@ Route::get('/productos/{slug}', [ProductoController::class, 'show']);
 Route::get('/resenas-pagina', [ResenaPaginaController::class, 'index']);
 Route::post('/resenas-pagina', [ResenaPaginaController::class, 'store']);
 
+//Calcular talla ideal 
+Route::post('/calcular-talla', [TallaController::class, 'calcularTallaIdeal']);
+
 // Ruta pública para la IA
 Route::post('/outfit-wizard', [AdminOutfitWizardController::class, 'generate']);
 

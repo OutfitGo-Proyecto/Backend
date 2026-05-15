@@ -28,7 +28,7 @@ class ProductoController extends Controller
 
         // 2. Filtros
         if ($request->filled('publico')) {
-            $query->where('publico', $request->publico); // Corregido: 'where' estándar en vez de scope por si acaso
+            $query->where('publico', $request->publico); 
         }
 
         if ($request->filled('marca_id')) {
