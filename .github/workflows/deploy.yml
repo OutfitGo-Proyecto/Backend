@@ -23,6 +23,16 @@ jobs:
           proxy_key: ${{ secrets.SSH_KEY }}
           command_timeout: 30m
           script: |
+            # --- AMPLIACIÓN DE DISCO TEMPORAL ---
+            echo "=== AMPLIANDO DISCO ==="
+            df -h
+            sudo growpart /dev/xvda 1 || true
+            sudo resize2fs /dev/xvda1 || true
+            sudo growpart /dev/nvme0n1 1 || true
+            sudo resize2fs /dev/nvme0n1p1 || true
+            df -h
+            echo "======================="
+
             # Instalar Docker si no existe
             if ! command -v docker &> /dev/null; then
               echo "Instalando Docker..."
