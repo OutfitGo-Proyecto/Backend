@@ -61,36 +61,36 @@ jobs:
             fi
 
             # Inyectar secretos de Google en el .env del servidor
-            touch home/.env
-            grep -q "^GOOGLE_CLIENT_ID=" home/.env && sed -i "s|^GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}|" home/.env || echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> home/.env
-            grep -q "^GOOGLE_CLIENT_SECRET=" home/.env && sed -i "s|^GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}|" home/.env || echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> home/.env
-            grep -q "^GOOGLE_REDIRECT_URI=" home/.env && sed -i "s|^GOOGLE_REDIRECT_URI=.*|GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}|" home/.env || echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> home/.env
+            touch .env
+            grep -q "^GOOGLE_CLIENT_ID=" .env && sed -i "s|^GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}|" .env || echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> .env
+            grep -q "^GOOGLE_CLIENT_SECRET=" .env && sed -i "s|^GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}|" .env || echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> .env
+            grep -q "^GOOGLE_REDIRECT_URI=" .env && sed -i "s|^GOOGLE_REDIRECT_URI=.*|GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}|" .env || echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> .env
+            
             # INYECTAR NUEVOS SECRETOS (Stripe, Correo e IAs)
-            grep -q "^STRIPE_SECRET=" home/.env && sed -i "s|^STRIPE_SECRET=.*|STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}|" home/.env || echo "STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}" >> home/.env
-            grep -q "^MAIL_PASSWORD=" home/.env && sed -i "s|^MAIL_PASSWORD=.*|MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}|" home/.env || echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> home/.env
-            grep -q "^GROQ_API_KEY=" home/.env && sed -i "s|^GROQ_API_KEY=.*|GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}|" home/.env || echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> home/.env
-            grep -q "^GEMINI_API_KEY=" home/.env && sed -i "s|^GEMINI_API_KEY=.*|GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}|" home/.env || echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> home/.env
+            grep -q "^STRIPE_SECRET=" .env && sed -i "s|^STRIPE_SECRET=.*|STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}|" .env || echo "STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}" >> .env
+            grep -q "^MAIL_PASSWORD=" .env && sed -i "s|^MAIL_PASSWORD=.*|MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}|" .env || echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
+            grep -q "^GROQ_API_KEY=" .env && sed -i "s|^GROQ_API_KEY=.*|GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}|" .env || echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env
+            grep -q "^GEMINI_API_KEY=" .env && sed -i "s|^GEMINI_API_KEY=.*|GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}|" .env || echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
 
             # INYECTAR CONEXIÓN RDS
-            grep -q "^DB_HOST=" home/.env && sed -i "s|^DB_HOST=.*|DB_HOST=${{ secrets.RDS_HOST }}|" home/.env || echo "DB_HOST=${{ secrets.RDS_HOST }}" >> home/.env
-            grep -q "^DB_DATABASE=" home/.env && sed -i "s|^DB_DATABASE=.*|DB_DATABASE=laravel|" home/.env || echo "DB_DATABASE=laravel" >> home/.env
-            grep -q "^DB_USERNAME=" home/.env && sed -i "s|^DB_USERNAME=.*|DB_USERNAME=admin|" home/.env || echo "DB_USERNAME=admin" >> home/.env
-            grep -q "^DB_PASSWORD=" home/.env && sed -i "s|^DB_PASSWORD=.*|DB_PASSWORD=${{ secrets.RDS_PASSWORD }}|" home/.env || echo "DB_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> home/.env
+            grep -q "^DB_HOST=" .env && sed -i "s|^DB_HOST=.*|DB_HOST=${{ secrets.RDS_HOST }}|" .env || echo "DB_HOST=${{ secrets.RDS_HOST }}" >> .env
+            grep -q "^DB_DATABASE=" .env && sed -i "s|^DB_DATABASE=.*|DB_DATABASE=outfitgo|" .env || echo "DB_DATABASE=outfitgo" >> .env
+            grep -q "^DB_USERNAME=" .env && sed -i "s|^DB_USERNAME=.*|DB_USERNAME=admin|" .env || echo "DB_USERNAME=admin" >> .env
+            grep -q "^DB_PASSWORD=" .env && sed -i "s|^DB_PASSWORD=.*|DB_PASSWORD=${{ secrets.RDS_PASSWORD }}|" .env || echo "DB_PASSWORD=${{ secrets.RDS_PASSWORD }}" >> .env
 
             # 1. Bajamos contenedores anteriores y liberamos espacio en disco
             sudo docker compose -f docker-compose.prod.yml down --remove-orphans
             sudo docker system prune -af
 
             # 2. Instalación de librerías ANTES de levantar el servicio principal
-            # Usamos 'run --rm' para crear un contenedor temporal que instale todo
             sudo docker compose -f docker-compose.prod.yml run --rm app composer install --optimize-autoloader
 
             # 3. Levantamos el sistema completo
             sudo docker compose -f docker-compose.prod.yml up -d --build
             
             # 4. Arreglo de permisos y Limpieza de caché
-            sudo chown -R ubuntu:www-data home/storage home/bootstrap/cache
-            sudo chmod -R 775 home/storage home/bootstrap/cache
+            sudo chown -R ubuntu:www-data storage bootstrap/cache
+            sudo chmod -R 775 storage bootstrap/cache
             sudo docker compose -f docker-compose.prod.yml exec -T app php artisan config:clear
             sudo docker compose -f docker-compose.prod.yml exec -T app php artisan key:generate --force
 
