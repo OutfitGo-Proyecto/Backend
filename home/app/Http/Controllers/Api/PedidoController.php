@@ -22,11 +22,11 @@ class PedidoController extends Controller
             if ($pedido->estado === 'pagado' || $pedido->estado === 'entregando') {
                 $segundos = $ahora->diffInSeconds($pedido->updated_at);
                 
-                if ($segundos >= 15) {
+                if ($segundos >= 30) {
                     $pedido->estado = 'entregado';
                     $pedido->timestamps = false;
                     $pedido->save();
-                } elseif ($segundos >= 10 && $pedido->estado === 'pagado') {
+                } elseif ($segundos >= 15 && $pedido->estado === 'pagado') {
                     $pedido->estado = 'entregando';
                     $pedido->timestamps = false;
                     $pedido->save();
@@ -93,6 +93,12 @@ class PedidoController extends Controller
         }
 
         $this->sincronizarEstadosPedidos([$pedido]);
+
+        // Si el pedido está pagado o entregando, lo entregamos primero automáticamente para poder procesar la devolución
+        if ($pedido->estado === 'pagado' || $pedido->estado === 'entregando') {
+            $pedido->estado = 'entregado';
+            $pedido->save();
+        }
 
         if ($pedido->estado !== 'entregado' && $pedido->estado !== 'enviado') {
             return response()->json([
