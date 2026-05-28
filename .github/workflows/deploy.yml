@@ -71,10 +71,20 @@ jobs:
             grep -q "^GOOGLE_REDIRECT_URI=" .env && sed -i "s|^GOOGLE_REDIRECT_URI=.*|GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}|" .env || echo "GOOGLE_REDIRECT_URI=${{ secrets.GOOGLE_REDIRECT_URI }}" >> .env
             
             grep -q "^STRIPE_SECRET=" .env && sed -i "s|^STRIPE_SECRET=.*|STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}|" .env || echo "STRIPE_SECRET=${{ secrets.STRIPE_SECRET }}" >> .env
+            
+            # --- CONFIGURACIÓN DE CORREO AÑADIDA ---
+            grep -q "^MAIL_MAILER=" .env && sed -i "s|^MAIL_MAILER=.*|MAIL_MAILER=smtp|" .env || echo "MAIL_MAILER=smtp" >> .env
+            grep -q "^MAIL_HOST=" .env && sed -i "s|^MAIL_HOST=.*|MAIL_HOST=smtp.gmail.com|" .env || echo "MAIL_HOST=smtp.gmail.com" >> .env
+            grep -q "^MAIL_PORT=" .env && sed -i "s|^MAIL_PORT=.*|MAIL_PORT=587|" .env || echo "MAIL_PORT=587" >> .env
+            grep -q "^MAIL_USERNAME=" .env && sed -i "s|^MAIL_USERNAME=.*|MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}|" .env || echo "MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}" >> .env
             grep -q "^MAIL_PASSWORD=" .env && sed -i "s|^MAIL_PASSWORD=.*|MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}|" .env || echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> .env
+            grep -q "^MAIL_ENCRYPTION=" .env && sed -i "s|^MAIL_ENCRYPTION=.*|MAIL_ENCRYPTION=tls|" .env || echo "MAIL_ENCRYPTION=tls" >> .env
+            grep -q "^MAIL_FROM_ADDRESS=" .env && sed -i "s|^MAIL_FROM_ADDRESS=.*|MAIL_FROM_ADDRESS=${{ secrets.MAIL_USERNAME }}|" .env || echo "MAIL_FROM_ADDRESS=${{ secrets.MAIL_USERNAME }}" >> .env
+            
             grep -q "^GROQ_API_KEY=" .env && sed -i "s|^GROQ_API_KEY=.*|GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}|" .env || echo "GROQ_API_KEY=${{ secrets.GROQ_API_KEY }}" >> .env
             grep -q "^GEMINI_API_KEY=" .env && sed -i "s|^GEMINI_API_KEY=.*|GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}|" .env || echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
 
+            # --- BASE DE DATOS SIN TOCAR ---
             grep -q "^DB_HOST=" .env && sed -i "s|^DB_HOST=.*|DB_HOST=${{ secrets.RDS_HOST }}|" .env || echo "DB_HOST=${{ secrets.RDS_HOST }}" >> .env
             grep -q "^DB_DATABASE=" .env && sed -i "s|^DB_DATABASE=.*|DB_DATABASE=laravel|" .env || echo "DB_DATABASE=laravel" >> .env
             grep -q "^DB_USERNAME=" .env && sed -i "s|^DB_USERNAME=.*|DB_USERNAME=dwes|" .env || echo "DB_USERNAME=dwes" >> .env
@@ -109,4 +119,4 @@ jobs:
             sudo docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
             
             # 8. Opcional: Sembrado de datos
-           # sudo docker compose -f docker-compose.prod.yml exec -T app php artisan db:seed --force
+            # sudo docker compose -f docker-compose.prod.yml exec -T app php artisan db:seed --force
