@@ -109,4 +109,4 @@ jobs:
             sudo docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force
             
             # 8. Opcional: Sembrado de datos
-            sudo docker compose -f docker-compose.prod.yml exec -T app php artisan db:seed --force
+           # sudo docker compose -f docker-compose.prod.yml exec -T app php artisan db:seed --force
