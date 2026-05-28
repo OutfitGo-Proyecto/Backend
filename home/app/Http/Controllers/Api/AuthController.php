@@ -64,8 +64,8 @@ class AuthController extends Controller
             ]);
         }
 
-        // Si el correo no ha sido verificado no puede entrar.
-        if ($user && !$user->hasVerifiedEmail()) {
+        // Si el correo no ha sido verificado y no es administrador, no puede entrar.
+        if ($user && !$user->hasVerifiedEmail() && !Str::startsWith($user->rol, 'admin')) {
             throw ValidationException::withMessages([
                 'email' => ['Su correo no está verificado. Por favor, revisa tu bandeja de entrada.'],
             ]);

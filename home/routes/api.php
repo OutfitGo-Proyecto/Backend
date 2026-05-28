@@ -15,6 +15,7 @@ use \App\Http\Controllers\Api\SocialAuthController;
 use App\Http\Controllers\Api\AdminOutfitWizardController;
 use App\Http\Controllers\OutfitWizardController;
 use App\Http\Controllers\Api\OutfitController;
+use App\Http\Controllers\Api\TallaController;
 
 // Rutas Públicas de Outfit
 Route::post('/generar-outfit', [OutfitController::class, 'generarImagenOutfit']);
@@ -27,7 +28,6 @@ Route::get('/productos/{id}/historial', [ProductoController::class, 'historialPr
 // Ruta pública para obtener recomendaciones de productos relacionados a una prenda específica.
 Route::get('/productos/{id}/recomendados', [ProductoController::class, 'recomendados']);
 Route::get('/resenas-pagina', [ResenaPaginaController::class, 'index']);
-Route::post('/resenas-pagina', [ResenaPaginaController::class, 'store']);
 
 //Calcular talla ideal 
 Route::post('/calcular-talla', [TallaController::class, 'calcularTallaIdeal']);
@@ -96,5 +96,4 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::post('/resenas-pagina', [ResenaPaginaController::class, 'store']);
-    Route::get('/resenas-pagina', [ResenaPaginaController::class, 'index']);
 });
