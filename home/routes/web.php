@@ -61,4 +61,10 @@ Route::get('/api/documentation', function () {
     return view('swagger');
 })->name('api.documentation');
 
+Route::get('/api/swagger.json', function () {
+    return response()->file(public_path('swagger.json'), [
+        'Content-Type' => 'application/json'
+    ]);
+});
+
 
