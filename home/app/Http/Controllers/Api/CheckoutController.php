@@ -17,22 +17,22 @@ class CheckoutController extends Controller
 {
     public function iniciarPago(Request $request)
     {
-        // 1. Validamos que Angular nos manda la dirección Y los productos
+        // 1. Validamos que Angular nos manda la dirección Y los productos, y opcionalmente el cupón
         $request->validate([
             'address_id' => 'required|integer',
             'productos' => 'required|array|min:1',
             // Aseguramos que cada producto traiga su ID de variante y la cantidad
             'productos.*.producto_variante_id' => 'required|integer', 
             'productos.*.cantidad' => 'required|integer|min:1',
+            'coupon_code' => 'nullable|string',
         ]);
 
         /** @var \App\Models\User $user */
         $user = $request->user();
         $address = $user->addresses()->findOrFail($request->address_id);
 
-        $total = 0;
+        $subtotal = 0;
         $orderItemsData = [];
-        $line_items = [];
 
         // 2. Recorremos lo que manda Angular, pero BUSCAMOS EL PRECIO REAL en la BD por seguridad
         foreach ($request->productos as $item) {
@@ -49,8 +49,8 @@ class CheckoutController extends Controller
                 ], 422);
             }
 
-            // Calculamos el total con el precio real de la BD
-            $total += $variante->producto->precio * $item['cantidad'];
+            // Calculamos el subtotal con el precio real de la BD
+            $subtotal += $variante->producto->precio * $item['cantidad'];
 
             $orderItemsData[] = [
                 'producto_id'          => $variante->producto_id,
@@ -58,19 +58,39 @@ class CheckoutController extends Controller
                 'cantidad'             => $item['cantidad'],
                 'precio_unitario'      => $variante->producto->precio,
             ];
+        }
 
-            $unit_amount = (int) round($variante->producto->precio * 100);
-            $line_items[] = [
+        // 3. Aplicamos el cupón si viene en el request
+        $descuento = 0;
+        if ($request->filled('coupon_code')) {
+            $cupon = \App\Models\Cupon::where('codigo', strtoupper($request->coupon_code))
+                ->where('is_active', true)
+                ->first();
+
+            if ($cupon) {
+                if ($cupon->tipo === 'porcentaje') {
+                    $descuento = $subtotal * ($cupon->valor / 100);
+                } else if ($cupon->tipo === 'fijo') {
+                    $descuento = $cupon->valor;
+                }
+            }
+        }
+
+        $total = max(0, $subtotal - $descuento);
+
+        // 4. Construimos Stripe line_items con una única línea consolidada por el total rebajado
+        $line_items = [
+            [
                 'price_data' => [
                     'currency' => 'eur',
                     'product_data' => [
-                        'name' => "{$variante->producto->nombre} - {$variante->color->nombre} / {$variante->talla->nombre}"
+                        'name' => 'Total de tu compra en OutfitGo',
                     ],
-                    'unit_amount' => $unit_amount,
+                    'unit_amount' => (int) round($total * 100),
                 ],
-                'quantity' => $item['cantidad'],
-            ];
-        }
+                'quantity' => 1,
+            ]
+        ];
 
         try {
             DB::beginTransaction();
