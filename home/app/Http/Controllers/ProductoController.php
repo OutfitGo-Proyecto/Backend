@@ -28,7 +28,7 @@ class ProductoController extends Controller
 
         // 2. Filtros
         if ($request->filled('publico')) {
-            $query->where('publico', $request->publico); // Corregido: 'where' estándar en vez de scope por si acaso
+            $query->where('publico', $request->publico); 
         }
 
         if ($request->filled('marca_id')) {
@@ -61,7 +61,7 @@ class ProductoController extends Controller
             $query->where('precio', '<=', $request->precio_max);
         }
 
-        // 🌟 3. MAGIA FACETADA: Clonamos la query ANTES de paginar
+        // 3. Clonamos la query ANTES de paginar
         $facetQuery = clone $query;
         $idsProductosVivos = $facetQuery->select('productos.id');
 
@@ -98,9 +98,7 @@ class ProductoController extends Controller
                 'tallas' => $tallasDisponibles,
             ]
         ]);
-    }
-
-    public function show($slug)
+    }    public function show($slug)
     {
         $producto = Producto::where('slug', $slug)
             ->with(['marca', 'categoria', 'tallas', 'colores', 'imagenes', 'variantes.talla', 'variantes.color', 'resenas.user:id,name'])
@@ -115,9 +113,45 @@ class ProductoController extends Controller
             $query->orderBy('created_at', 'asc'); 
         }])->findOrFail($id);
 
+        $historial = $producto->historialPrecios;
+
+        if ($historial->isEmpty()) {
+            return response()->json([
+                'labels' => [now()->format('d/m')],
+                'precios' => [(float) $producto->precio]
+            ]);
+        }
+
         return response()->json([
-            'labels' => $producto->historialPrecios->map(fn($h) => $h->created_at->format('d/m')),
-            'precios' => $producto->historialPrecios->pluck('precio')
+            'labels' => $historial->map(fn($h) => $h->created_at->format('d/m')),
+            'precios' => $historial->map(fn($h) => (float) $h->precio)
         ]);
+    }
+
+    // Obtiene una lista de productos recomendados (de la misma categoría o aleatorios si no hay suficientes) para mostrar en el detalle de producto.
+    public function recomendados($id)
+    {
+        $producto = Producto::findOrFail($id);
+
+        $recomendados = Producto::where('categoria_id', $producto->categoria_id)
+            ->where('id', '!=', $producto->id)
+            ->where('stock', '>', 0)
+            ->with(['marca', 'categoria', 'tallas', 'colores', 'imagenes'])
+            ->inRandomOrder()
+            ->take(4)
+            ->get();
+
+        if ($recomendados->count() < 4) {
+            $otros = Producto::where('id', '!=', $producto->id)
+                ->whereNotIn('id', $recomendados->pluck('id'))
+                ->where('stock', '>', 0)
+                ->with(['marca', 'categoria', 'tallas', 'colores', 'imagenes'])
+                ->inRandomOrder()
+                ->take(4 - $recomendados->count())
+                ->get();
+            $recomendados = $recomendados->concat($otros);
+        }
+
+        return response()->json($recomendados);
     }
 }

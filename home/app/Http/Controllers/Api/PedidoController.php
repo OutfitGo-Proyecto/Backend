@@ -6,10 +6,35 @@ use App\Http\Controllers\Controller;
 use App\Models\Order; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\Producto;
+use App\Mail\RecomendacionProductoMail;
+use Illuminate\Support\Facades\Mail;
 
 class PedidoController extends Controller
 {
+    /**
+     * Devuelve el historial de pedidos del usuario logueado.
+     */
+    private function sincronizarEstadosPedidos($pedidos)
+    {
+        $ahora = now();
+        foreach ($pedidos as $pedido) {
+            if ($pedido->estado === 'pagado' || $pedido->estado === 'entregando') {
+                $segundos = $ahora->diffInSeconds($pedido->updated_at);
+                
+                if ($segundos >= 30) {
+                    $pedido->estado = 'entregado';
+                    $pedido->timestamps = false;
+                    $pedido->save();
+                } elseif ($segundos >= 15 && $pedido->estado === 'pagado') {
+                    $pedido->estado = 'entregando';
+                    $pedido->timestamps = false;
+                    $pedido->save();
+                }
+            }
+        }
+    }
+
     /**
      * Devuelve el historial de pedidos del usuario logueado.
      */
@@ -20,6 +45,7 @@ class PedidoController extends Controller
                         ->latest()  
                         ->paginate(5);
 
+        $this->sincronizarEstadosPedidos($pedidos->items());
 
         return response()->json([
             'message' => 'Historial de pedidos recuperado con éxito.',
@@ -66,9 +92,17 @@ class PedidoController extends Controller
             ], 404);
         }
 
-        if ($pedido->estado !== 'enviado') {
+        $this->sincronizarEstadosPedidos([$pedido]);
+
+        // Si el pedido está pagado o entregando, lo entregamos primero automáticamente para poder procesar la devolución
+        if ($pedido->estado === 'pagado' || $pedido->estado === 'entregando') {
+            $pedido->estado = 'entregado';
+            $pedido->save();
+        }
+
+        if ($pedido->estado !== 'entregado' && $pedido->estado !== 'enviado') {
             return response()->json([
-                'message' => 'Solo se pueden devolver pedidos que ya han sido enviados.'
+                'message' => 'Solo se pueden devolver pedidos que ya han sido entregados.'
             ], 400);
         }
 
@@ -80,4 +114,34 @@ class PedidoController extends Controller
             'pedido' => $pedido
         ], 200);
     }
+
+
+public function enviarRecomendacion($userId)
+{
+    $ultimaOrden = Order::with('orderItems.producto')
+        ->where('user_id', $userId)
+        ->latest()
+        ->first();
+
+    if (!$ultimaOrden || $ultimaOrden->orderItems->isEmpty()) {
+        return "El usuario no tiene compras.";
+    }
+
+    $categoriaId = $ultimaOrden->orderItems->first()->producto->categoria_id;
+    $productoCompradoId = $ultimaOrden->orderItems->first()->producto_id;
+
+    $recomendado = Producto::where('categoria_id', $categoriaId)
+        ->where('id', '!=', $productoCompradoId)
+        ->inRandomOrder() 
+        ->first();
+
+    if ($recomendado) {
+        $user = $ultimaOrden->user; 
+        Mail::to($user->email)->send(new RecomendacionProductoMail($user, $recomendado));
+        
+        return "Correo enviado con éxito";
+    }
+
+    return "No se encontró un producto similar para recomendar.";
+}
 }
